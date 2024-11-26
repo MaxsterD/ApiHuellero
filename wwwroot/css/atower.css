@@ -1,0 +1,40 @@
+﻿.montserrat-heading {
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 550; /* Un peso más grueso para los encabezados */
+    font-style: normal;
+    font-size: 6vw;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Añade una sombra al texto */
+}
+
+.montserrat-body {
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 300; /* Un peso normal para el cuerpo del texto */
+    font-size: 2vw;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Añade una sombra al texto */
+}
+
+
+.montserrat-content {
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 200; /* Un peso normal para el cuerpo del texto */
+    font-size: 1vw;
+}
+
+
+.montserrat {
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto; 
+}
+
+.page {
+    height: 100%;
+    overflow-y:hidden 
+}
+
+::deep .border-white{
+    border-color:white !important;
+}
+

@@ -1,0 +1,34 @@
+﻿@using ConsolaBlazor.Components.Utils
+
+@inherits LayoutComponentBase
+@inject ClienteSession UserSessionService
+@inject IDialogService Dialog
+
+<MudThemeProvider Theme="@AtowerTheme.Default" @bind-IsDarkMode="@_isDarkMode" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<MudPopoverProvider />
+
+<div>
+    <MudLayout Style="height:100vh; overflow-y:auto;">
+        <MudAppBar Color="Color.Primary" Fixed="false" Dense="true" Class="custom-width-appbar" Style="position:sticky; top:0;">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick=OpenNavMenuDrawer />
+            <MudImage Src="images/atower-logo.svg" Class="logo" />
+            <div class="montserrat title">Panel Administrativo</div>
+            <MudButton StartIcon="@Icons.Material.Filled.Workspaces" EndIcon="@Icons.Material.Filled.ArrowDropDown" Variant="Variant.Outlined" Class="border-white mud-theme-primary">
+                <MudText Typo="Typo.caption">@UserSessionService.UserSession?.Nombre</MudText>
+            </MudButton>
+
+            <MudSpacer />
+            <div class="d-flex justify-content-end ml-auto">
+                <MudLink Color="Color.Default" Style="color: white;" Underline="Underline.None" OnClick=CerrarSesion>Salir</MudLink>
+            </div>
+            <MudIconButton Icon="@Icons.Material.Filled.Apps" Color="Color.Inherit" />
+        </MudAppBar>
+
+        <NavMenuAtower @ref="navMenuRef" />
+        <MudMainContent Class="px-4 py-0 overflow-y-auto" Style="overflow-y:auto">
+            @Body
+        </MudMainContent>
+    </MudLayout>
+</div>

@@ -1,0 +1,107 @@
+﻿@page "/horarios"
+@using ConsolaBlazor.Services.DTOs.Login
+@using ConsolaBlazor.Services.DTOs.Horarios
+@attribute [Authorize]
+@inject IDialogService DialogService
+
+
+<div class="d-flex justify-center mt-1 py-1">
+    <MudPaper Class="pb-0" Elevation="1" Style="width: 45%; max-width: 900px; height:100%">
+
+        <MudContainer Class="d-flex align-center pl-1 py-1 pr-0" Style="@titleBarStyle">
+            <MudImage Src="images/Simbolo.png" Alt="Sisma" />
+            <MudText Style="font-size: 23px;">Horarios</MudText>
+
+            <MudContainer Class="d-flex justify-end pr-0">
+                <MudButton Size="Size.Small" Style="min-width:0" @onclick="Prueba">
+                    <MudImage Src="images/guardar.png" Alt="Guardar" title="Guardar" />
+                </MudButton>
+                <MudButton Size="Size.Small" Style="min-width:0">
+                    <MudImage Src="images/imprimir.png" Alt="Imprimir" title="Imprimir" />
+                </MudButton>
+            </MudContainer>
+        </MudContainer>
+
+        <MudGrid Spacing="1" Class="mt-3 px-1">
+            <MudItem Class="mx-0 ml-4" xs="3">
+                <MudText Style="color:#336699;">Descripcion</MudText>
+            </MudItem>
+            <MudItem Class="mx-0" xs="6">
+                <MudTextField ShrinkLabel @bind-Value="horario.Descripcion"
+                              InputType="InputType.Text"
+                              Required="true"
+                              RequiredError="El Input Descripcion es requerido"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Style="height:20px">
+                </MudTextField>
+            </MudItem>
+            <MudItem Class="mx-0 ml-4" xs="3">
+                <MudText Style="color:#336699;">Hora Inicio</MudText>
+            </MudItem>
+            <MudItem Class="mx-0" xs="6">
+                <MudTimePicker @bind-Text="horario.HoraInicio" 
+                               @ref = "horaInicio"
+                               Required="false" 
+                               Margin="Margin.Dense"
+                               Variant="Variant.Outlined"
+                               Underline="false"/>
+            </MudItem>
+            <MudItem Class="mx-0 ml-4" xs="3">
+                <MudText Style="color:#336699;">Hora Fin</MudText>
+            </MudItem>
+            <MudItem Class="mx-0" xs="6">
+                <MudTimePicker @bind-Text="horario.HoraFin"
+                               @ref="horaFin"
+                               Required="false"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Underline="false"/>
+            </MudItem>
+        </MudGrid>
+        
+        <MudDataGrid HeaderClass="data-grid-header" T="HorariosDTO" ReadOnly="false" Items="Horarios" Class="mb-0" FilterMode="DataGridFilterMode.Simple"
+                     Dense="true" Striped="true" Bordered="true" Virtualize="true" CommittedItemChanges="@ActualizarHorario"
+                     EditMode="DataGridEditMode.Form" EditTrigger="DataGridEditTrigger.Manual">
+            <Columns>
+                <PropertyColumn Property="x => x.Id" Hidden="true" Title="Id" Editable="false"
+                                HeaderClass="header-grid"
+                                CellClass="data-grid-cell" />
+
+                <PropertyColumn Property="x => x.Descripcion" Title="Descripcion" Filterable="true"
+                                HeaderClass="header-grid"
+                                CellClass="data-grid-cell" 
+                                HeaderStyle="max-width:100px !important;word-wrap: break-word !important;white-space: normal !important;" 
+                                CellStyle="max-width:100px !important;word-wrap: break-word !important;white-space: normal !important;" />
+
+                <PropertyColumn Property="x => x.HoraInicio" Title="Hora Inicio"
+                                HeaderClass="header-grid"
+                                CellClass="data-grid-cell" Style="max-width:150px !important" 
+                                HeaderStyle="max-width:100px !important;word-wrap: break-word !important;white-space: normal !important;"
+                                CellStyle="max-width:100px !important;word-wrap: break-word !important;white-space: normal !important;" />
+
+                <PropertyColumn Property="x => x.HoraFin" Title="Hora Fin"
+                                HeaderClass="header-grid"
+                                CellClass="data-grid-cell" Style="max-width:150px !important" 
+                                HeaderStyle="max-width:100px !important;word-wrap: break-word !important;white-space: normal !important;"
+                                CellStyle="max-width:100px !important;word-wrap: break-word !important;white-space: normal !important;" />
+
+                <TemplateColumn Hidden="false"
+                    CellClass="d-flex justify-end align-center">
+                    <CellTemplate>
+                        <MudStack Row>
+                            <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" />
+                            <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="@((e) => BorrarHorario(context.Item))" />
+                        </MudStack>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+            <PagerContent>
+                <MudDataGridPager T="HorariosDTO" />
+            </PagerContent>
+        </MudDataGrid>
+
+
+
+    </MudPaper>
+</div>

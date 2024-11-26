@@ -1,0 +1,115 @@
+﻿@page "/administrarTiempos"
+@using ConsolaBlazor.Services.DTOs.Login
+@using ConsolaBlazor.Services.DTOs.Horarios
+@attribute [Authorize]
+@inject IDialogService DialogService
+
+
+<div class="d-flex justify-center mt-1 py-1">
+    <MudPaper Class="pb-0" Elevation="1" Style="width: 50%; height:100%">
+
+        <MudContainer Class="d-flex align-center pl-1 py-1 pr-0" Style="@titleBarStyle">
+            <MudImage Src="images/Simbolo.png" Alt="Sisma" />
+            <MudText Style="font-size: 23px;width:100%">Administracion de Tiempos</MudText>
+
+            <MudContainer Class="d-flex justify-end pr-0">
+                <MudButton Size="Size.Small" Style="min-width:0" @onclick="Buscar">
+                    <MudImage Src="images/guardar.png" Alt="Guardar" title="Guardar" />
+                </MudButton>
+                <MudButton Size="Size.Small" Style="min-width:0">
+                    <MudImage Src="images/imprimir.png" Alt="Imprimir" title="Imprimir" />
+                </MudButton>
+            </MudContainer>
+        </MudContainer>
+
+        <MudGrid Spacing="1" Class="mt-3 px-1">
+            <MudItem Class="mx-0 ml-4" xs="12" sm="3">
+                <MudText Style="color:#336699;">Lider</MudText>
+            </MudItem>
+            <MudItem Class="mx-0" xs="12" sm="5">
+                <MudTextField ShrinkLabel @bind-Value="Lider.Nombre"
+                              InputType="InputType.Text"
+                              Required="true"
+                              RequiredError="El Input Descripcion es requerido"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Style="height:20px">
+                </MudTextField>
+            </MudItem>
+            <MudItem Class="mx-0" xs="12" sm="3">
+                <MudIcon Icon="@Icons.Material.Filled.Search" @onclick="BuscarLideres" Title="Buscar" Class="cursor-pointer" />
+            </MudItem>
+            <MudItem Class="mx-0 ml-4" xs="12" sm="3">
+                <MudText Style="color:#336699;">Periodo de entrada</MudText>
+            </MudItem>
+            <MudItem Class="mx-0" xs="12" sm="5">
+                <MudDateRangePicker @bind-DateRange="@_dateRange" Margin="Margin.Dense" Variant="Variant.Outlined" />
+            </MudItem>
+        </MudGrid>
+
+        <MudDataGrid HeaderClass="data-grid-header" T="TableRowDataDate" ReadOnly="false" Items="tableData" Class="mb-0" FilterMode="DataGridFilterMode.Simple"
+                     Dense="true" Striped="true" Bordered="true" Virtualize="false" RowStyleFunc="@_rowStyleFunc"
+                     EditMode="DataGridEditMode.Form" EditTrigger="DataGridEditTrigger.Manual" >
+            <Columns>
+                <PropertyColumn Property="x => x.Column1" Hidden="true" Title="Id" Editable="false"
+                                HeaderClass="header-grid"
+                                CellClass="data-grid-cell" />
+
+                <PropertyColumn Property="x => x.Column2" Title="Empleado" Filterable="true"
+                                HeaderClass="header-grid"
+                                CellClass="data-grid-cell"
+                                HeaderStyle="max-width:100px !important;word-wrap: break-word !important;white-space: normal !important;"
+                                CellStyle="max-width:100px !important;word-wrap: break-word !important;white-space: normal !important;" />
+
+                <PropertyColumn Property="x => x.Column4" Title="Hora Entrada"
+                                HeaderClass="header-grid"
+                                CellClass="data-grid-cell" Style="max-width:150px !important"
+                                HeaderStyle="max-width:100px !important;word-wrap: break-word !important;white-space: normal !important;"
+                                CellStyle="max-width:100px !important;word-wrap: break-word !important;white-space: normal !important;">
+                    <EditTemplate>
+                        <MudTextField ShrinkLabel @bind-Value="context.Item.Column3"
+                                      InputType="InputType.Text"
+                                      Required="true"
+                                      RequiredError="El Input Descripcion es requerido"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Style="height:20px">
+                        </MudTextField>
+                    </EditTemplate>
+                </PropertyColumn>
+
+                <PropertyColumn Property="x => (x.Column5)" Title="Hora Salida"
+                                HeaderClass="header-grid"
+                                CellClass="data-grid-cell" Style="max-width:150px !important"
+                                HeaderStyle="max-width:100px !important;word-wrap: break-word !important;white-space: normal !important;"
+                                CellStyle="max-width:100px !important;word-wrap: break-word !important;white-space: normal !important;">
+                            <EditTemplate>
+                        <MudDatePicker @bind-Date="@context.Item.Column5" Label="Hora Salida" />
+                            </EditTemplate>
+                            </PropertyColumn>
+
+                <PropertyColumn Property="x => x.Column5" Title="Dia"
+                                HeaderClass="header-grid"
+                                CellClass="data-grid-cell" Style="max-width:150px !important"
+                                HeaderStyle="max-width:100px !important;word-wrap: break-word !important;white-space: normal !important;"
+                                CellStyle="max-width:100px !important;word-wrap: break-word !important;white-space: normal !important;" />
+
+                <TemplateColumn Hidden="false"
+                                CellClass="d-flex justify-end align-center">
+                    <CellTemplate>
+                        <MudStack Row>
+                            <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" />
+                            <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="@((e) => DeleteServerAsync(context.Item))" />
+                        </MudStack>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+            <PagerContent>
+                <MudDataGridPager T="TableRowDataDate" />
+            </PagerContent>
+        </MudDataGrid>
+
+
+
+    </MudPaper>
+</div>

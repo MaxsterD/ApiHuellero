@@ -1,0 +1,57 @@
+﻿
+@typeparam T
+
+<MudDialog>
+    <TitleContent>
+        <h3>@Titulo</h3>
+    </TitleContent>
+    <DialogContent>
+        <div class="d-flex justify-space-between gap-7 mb-4">
+            <MudSelect Immediate Dense T="string" @bind-Value="SelectedParametro" Disabled="!OpcionesBusqueda.Any()" Label="Parámetros" Placeholder="Buscar por..." AnchorOrigin="Origin.BottomCenter">
+                @if (OpcionesBusqueda != null && OpcionesBusqueda.Any())
+                {
+                    @foreach (string param in OpcionesBusqueda)
+                    {
+                        <MudSelectItem Value="@(param)" />
+                    }
+                }
+            </MudSelect>
+
+            <MudTextField Immediate FullWidth @bind-Value="TextoBusqueda" Disabled="!OpcionesBusqueda.Any()" Label="Buscar" OnKeyDown="SearchFn" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium"></MudTextField>
+        </div>
+
+
+        <MudTable T="T" Items="DatosTabla" Hover Dense Striped Loading="Loading" @bind-SelectedItem="selectedRow" OnRowClick="SelectRowFn">
+                <HeaderContent>
+                    @if (ColumnasTabla != null && ColumnasTabla.Any())
+                    {
+                        @foreach (string columna in ColumnasTabla)
+                        {
+                            <MudTh>@columna</MudTh>
+                        }
+                    }
+                </HeaderContent>
+                <RowTemplate>
+                    @if (DatosTabla != null && DatosTabla.Any())
+                    {
+                        @if (ColumnasTabla != null && ColumnasTabla.Any())
+                        {
+                            @foreach (string columna in ColumnasTabla)
+                            {
+                                <MudTd DataLabel="@columna" Class="cursor-pointer">@GetPropertyValue(context, columna)</MudTd>
+                            }
+                        }
+                    }
+                </RowTemplate>
+                <PagerContent>
+                    @if (DatosTabla != null && DatosTabla.Any())
+                    {
+                        <MudTablePager />
+                    }
+                </PagerContent>
+            </MudTable>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CloseFn">Cancelar</MudButton>
+    </DialogActions>
+</MudDialog>
