@@ -1,25 +1,36 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+# Consulte https://aka.ms/customizecontainer para aprender a personalizar su contenedor de depuración y cómo Visual Studio usa este Dockerfile para compilar sus imágenes para una depuración más rápida.
+
+# Esta fase se usa cuando se ejecuta desde VS en modo rápido (valor predeterminado para la configuración de depuración)
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+USER app
+WORKDIR /app
+
+# Instalar nano
+USER root
+RUN apt-get update && apt-get install -y nano
+
+
 EXPOSE 8080
 EXPOSE 8081
 
+
+# Esta fase se usa para compilar el proyecto de servicio
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-
-COPY ConsolaBlazor.csproj .
-RUN dotnet restore ConsolaBlazor.csproj
-
-
+COPY ["ApiConsola/ApiConsola.csproj", "ApiConsola/"]
+RUN dotnet restore "./ApiConsola/ApiConsola.csproj"
 COPY . .
-RUN dotnet build ConsolaBlazor.csproj -c Release -o /app/build
+WORKDIR "/src/ApiConsola"
+RUN dotnet build "./ApiConsola.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-
+# Esta fase se usa para publicar el proyecto de servicio que se copiará en la fase final.
 FROM build AS publish
-RUN dotnet publish ConsolaBlazor.csproj -c Release -o /app/publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./ApiConsola.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-FROM nginx:alpine AS final
-WORKDIR /user/share/nginx/html
-
-# Instalar nano
-RUN apk update && apk add nano
-
-COPY --from=publish /app/publish/wwwroot .
-COPY  nginx.conf /etc/nginx/nginx.conf
+# Esta fase se usa en producción o cuando se ejecuta desde VS en modo normal (valor predeterminado cuando no se usa la configuración de depuración)
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "ApiConsola.dll"]

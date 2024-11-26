@@ -1,4 +1,4 @@
-﻿namespace ConsolaBlazor.Services.DTOs.Horarios
+﻿namespace ApiConsola.Services.DTOs.Horarios
 {
     public class HorariosDTO
     {

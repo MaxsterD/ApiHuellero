@@ -1,0 +1,408 @@
+[
+  {
+    "Nombre": "CLINICA SANTA MARIA SAS ",
+    "Password": "abc.1234",
+    "Correo": "seguimientotickets@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "Santa Maria"
+  },
+  {
+    "Nombre": "Cl�\\xadnica universitaria Medicina Integral CUMI",
+    "Password": "abc.1234",
+    "Correo": "sistemas@cumi.com.co",
+    "Rol": "cliente",
+    "Cliente": "Cumi"
+  },
+  {
+    "Nombre": "HEALTH CARS",
+    "Password": "abc.1234",
+    "Correo": "nes00tor@hotmail.com",
+    "Rol": "cliente",
+    "Cliente": "Healt Cars"
+  },
+  {
+    "Nombre": "SEDARTE MEDICINA ESPECIALIZADA S.A.S",
+    "Password": "abc.1234",
+    "Correo": "sistemas.sedarte@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "Sedarte"
+  },
+  {
+    "Nombre": "CENTRO OFTALMOLOGICO EBENEZER S.A.S ",
+    "Password": "abc.1234",
+    "Correo": "unicob1@yahoo.es",
+    "Rol": "cliente",
+    "Cliente": "Ebenezer"
+  },
+  {
+    "Nombre": "Salud  a su Hogar IPS",
+    "Password": "abc.1234",
+    "Correo": "saludasuhogaripssas@hotmail.com",
+    "Rol": "cliente",
+    "Cliente": "Salud a su Hogar"
+  },
+  {
+    "Nombre": "SALUD SOCIAL",
+    "Password": "abc.1234",
+    "Correo": "sistemas@clinicasaludsocial.com",
+    "Rol": "cliente",
+    "Cliente": "Salud Social"
+  },
+  {
+    "Nombre": "PRIMAR SALUD",
+    "Password": "abc.1234",
+    "Correo": "utprimarsalud@hotmail.com",
+    "Rol": "cliente",
+    "Cliente": "Primar Salud"
+  },
+  {
+    "Nombre": "AGILITY",
+    "Password": "abc.1234",
+    "Correo": "info@cuidadoseguro.com",
+    "Rol": "cliente",
+    "Cliente": "Agility"
+  },
+  {
+    "Nombre": "OPTIMY CASA DEL HIDALGO SAS",
+    "Password": "abc.1234",
+    "Correo": "manager@espacio94.com.co",
+    "Rol": "cliente",
+    "Cliente": "Casa de hidalgo"
+  },
+  {
+    "Nombre": "Clinica Monter�\\xada",
+    "Password": "abc.1234",
+    "Correo": "sistemas@clinicamonteria.com.co",
+    "Rol": "cliente",
+    "Cliente": "Clinica Monteria"
+  },
+  {
+    "Nombre": "IPS Punto Vital S.A.S",
+    "Password": "abc.1234",
+    "Correo": "sistemas@puntovitalips.com",
+    "Rol": "cliente",
+    "Cliente": "IPS Punto Vital S.A.S"
+  },
+  {
+    "Nombre": "Unidad Medico Quirúrgica Santiago S.A.S",
+    "Password": "abc.1234",
+    "Correo": "santiagosascontabilidad@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "Unidad Medico Quirurgica Santiago S.A.S"
+  },
+  {
+    "Nombre": "CRESER CENTRO DE  REHABILITACIÓN DEL SER.",
+    "Password": "abc.1234",
+    "Correo": "gerencia.creserips@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "CRESER CENTRO DE  REHABILITACIÓN DEL SER."
+  },
+  {
+    "Nombre": "CLINICA DE VARICES SAS",
+    "Password": "abc.1234",
+    "Correo": "varices@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "CLINICA DE VARICES SAS"
+  },
+  {
+    "Nombre": "CLINICA INTERNATIONAL BARRANQUILLA",
+    "Password": "abc.1234",
+    "Correo": "humbertolora@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "CLINICA INTERNATIONAL BARRANQUILLA"
+  },
+  {
+    "Nombre": "INTEGRA",
+    "Password": "abc.1234",
+    "Correo": "integralips@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "INTEGRA"
+  },
+  {
+    "Nombre": "DUETICA - BUENASALUD",
+    "Password": "abc.1234",
+    "Correo": "edupertuz@hotmail.com",
+    "Rol": "cliente",
+    "Cliente": "DUETICA - BUENASALUD"
+  },
+  {
+    "Nombre": "CLINICA DE FRACTURAS Y MEDICINA LABORAL S.A.S",
+    "Password": "abc.1234",
+    "Correo": "asistcontabilidadframedic@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "CLINICA DE FRACTURAS Y MEDICINA LABORAL S.A.S"
+  },
+  {
+    "Nombre": "MATERNAL AND FETAL CARE S.A.S",
+    "Password": "abc.1234",
+    "Correo": "mirlediazma@gamil.com",
+    "Rol": "cliente",
+    "Cliente": "MATERNAL AND FETAL CARE S.A.S"
+  },
+  {
+    "Nombre": "Cuidado Seguro en Casa",
+    "Password": "abc.1234",
+    "Correo": "sballesteros@cuidadoseguro.com.co",
+    "Rol": "cliente",
+    "Cliente": "Cuidado Seguro en Casa"
+  },
+  {
+    "Nombre": "SOCARDIO",
+    "Password": "abc.1234",
+    "Correo": "cartera@socardio.com",
+    "Rol": "cliente",
+    "Cliente": "SOCARDIO"
+  },
+  {
+    "Nombre": "NACIONAL DE SALUD IPSSAS",
+    "Password": "abc.1234",
+    "Correo": "droguerianacional1@hotmail.com",
+    "Rol": "cliente",
+    "Cliente": "NACIONAL DE SALUD IPSSAS"
+  },
+  {
+    "Nombre": "IPS INTEGRAL CLINICAL CARE",
+    "Password": "abc.1234",
+    "Correo": "integralclinicalcare@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "IPS INTEGRAL CLINICAL CARE"
+  },
+  {
+    "Nombre": "Soluciones Diagnosticas del Rio S.A.S",
+    "Password": "abc.1234",
+    "Correo": "coordinacionima@solucionesdiagnosticasdelrio.com",
+    "Rol": "cliente",
+    "Cliente": "Soluciones Diagnosticas del Rio S.A.S"
+  },
+  {
+    "Nombre": "ADI SALUD IPS S.A.S",
+    "Password": "abc.1234",
+    "Correo": "adisalud1@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "ADI SALUD IPS S.A.S"
+  },
+  {
+    "Nombre": "Institución Prestadora SEKEIMO",
+    "Password": "abc.1234",
+    "Correo": "coord.administrativa@sekeimoipsi.com",
+    "Rol": "cliente",
+    "Cliente": "Institucion Prestadora SEKEIMO"
+  },
+  {
+    "Nombre": "SISMA CORPORATION SAS ",
+    "Password": "abc.1234",
+    "Correo": "ypadilla@sismasalud.com",
+    "Rol": "cliente",
+    "Cliente": "SISMA CORPORATION SAS "
+  },
+  {
+    "Nombre": "INTTEGRAL IPS",
+    "Password": "abc.1234",
+    "Correo": "inttegralips@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "INTTEGRAL IPS"
+  },
+  {
+    "Nombre": "OXXISALUD SAS",
+    "Password": "abc.1234",
+    "Correo": "oxxisalud@oxxisalud.com",
+    "Rol": "cliente",
+    "Cliente": "OXXISALUD SAS"
+  },
+  {
+    "Nombre": "FLASHMEDICA S.A.S",
+    "Password": "abc.1234",
+    "Correo": "flashmedica123@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "FLASHMEDICA S.A.S"
+  },
+  {
+    "Nombre": "REHVITAL Profesionales de Rehabilitación y ortopedia sas ",
+    "Password": "abc.1234",
+    "Correo": "carterarehvital@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "REHVITAL Profesionales de Rehabilitacion y ortopedia sas "
+  },
+  {
+    "Nombre": "BI-MEDICAL SAS",
+    "Password": "abc.1234",
+    "Correo": "gestionbimedical@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "BI-MEDICAL SAS"
+  },
+  {
+    "Nombre": "LIGA CORDOBESA CONTRA EL C�\\x81NCER",
+    "Password": "abc.1234",
+    "Correo": "liga@liga.com",
+    "Rol": "cliente",
+    "Cliente": "LIGA CORDOBESA CONTRA EL CANCER"
+  },
+  {
+    "Nombre": "CONCESIONES MEDICAS ESPECIALIZADAS IPS SAS ZOMAC",
+    "Password": "abc.1234",
+    "Correo": "cmezomacmontelibano@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "CONCESIONES MEDICAS ESPECIALIZADAS IPS SAS ZOMAC"
+  },
+  {
+    "Nombre": "INVERSIONES EJJ S.A.S.",
+    "Password": "abc.1234",
+    "Correo": "proyectoparquedelsol@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "INVERSIONES EJJ S.A.S."
+  },
+  {
+    "Nombre": "TREKKER HOTELES",
+    "Password": "abc.1234",
+    "Correo": "trekkerhoteles@gmiail.com",
+    "Rol": "cliente",
+    "Cliente": "TREKKER HOTELES"
+  },
+  {
+    "Nombre": "LUCAS - UNIDAD MEDICA ESPECIALIZADA EN ANTENCION Y HERIDAS",
+    "Password": "abc.1234",
+    "Correo": "lucas@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "LUCAS - UNIDAD MEDICA ESPECIALIZADA EN ANTENCION Y HERIDAS"
+  },
+  {
+    "Nombre": "SUSALUDCOLOMBIA SAS",
+    "Password": "abc.1234",
+    "Correo": "sistemas@disclinica.com",
+    "Rol": "cliente",
+    "Cliente": "SUSALUDCOLOMBIA SAS"
+  },
+  {
+    "Nombre": "Ips San Rafael Coveñas S.A.S",
+    "Password": "abc.1234",
+    "Correo": "soportesismaipssanrafaelcovena@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "Ips San Rafael Coveñas S.A.S"
+  },
+  {
+    "Nombre": "PROSEGUIR IPS REHABILITACION INTEGRAL S.A.S.",
+    "Password": "abc.1234",
+    "Correo": "proseguir_r_i@hotmail.com",
+    "Rol": "cliente",
+    "Cliente": "PROSEGUIR IPS REHABILITACION INTEGRAL S.A.S."
+  },
+  {
+    "Nombre": "Antioqueña de Inversiones",
+    "Password": "abc.1234",
+    "Correo": "antioquenadeinversionesinmobil@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "Antioquena de Inversiones"
+  },
+  {
+    "Nombre": "MYH",
+    "Password": "abc.1234",
+    "Correo": "0@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "MYH"
+  },
+  {
+    "Nombre": "CENTRO AVANZADO DE ATENCION Y TRATAMIENTO DE HERIDAS CAATH",
+    "Password": "abc.1234",
+    "Correo": "calidadcaath@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "CENTRO AVANZADO DE ATENCION Y TRATAMIENTO DE HERIDAS CAATH"
+  },
+  {
+    "Nombre": "CLINICA QUIRURGICA DE MANGA",
+    "Password": "abc.1234",
+    "Correo": "gutier67@hotmail.com",
+    "Rol": "cliente",
+    "Cliente": "CLINICA QUIRURGICA DE MANGA"
+  },
+  {
+    "Nombre": "NICOLL ACOSTA ",
+    "Password": "abc.1234",
+    "Correo": "r.triana@gmil.com",
+    "Rol": "cliente",
+    "Cliente": "NICOLL ACOSTA "
+  },
+  {
+    "Nombre": "911 ASISTENCIA MEDICA DOMICILIARIA IPS S.A.S",
+    "Password": "abc.1234",
+    "Correo": "asistentegerencialv.par911@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "911 ASISTENCIA MEDICA DOMICILIARIA IPS S.A.S"
+  },
+  {
+    "Nombre": "FUNDACION AMOR LUZ ESPERANZA",
+    "Password": "abc.1234",
+    "Correo": "fun.amorluzesperanza@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "FUNDACION AMOR LUZ ESPERANZA"
+  },
+  {
+    "Nombre": "CENTRO INTEGRAL DE NEURODESARROLLO Y REHABILITACION IPS CINER ",
+    "Password": "abc.1234",
+    "Correo": "ciner@ciner.com",
+    "Rol": "cliente",
+    "Cliente": "CENTRO INTEGRAL DE NEURODESARROLLO Y REHABILITACION IPS CINER "
+  },
+  {
+    "Nombre": "Unuversidad de Cordoba",
+    "Password": "abc.1234",
+    "Correo": "juangomez@correo.unicordoba.edu.co",
+    "Rol": "cliente",
+    "Cliente": "Unuversidad de Cordoba"
+  },
+  {
+    "Nombre": "Hotel Aloft Bogota Airport",
+    "Password": "abc.1234",
+    "Correo": "jhonfrey.mieles@aloftbogotaairport.com",
+    "Rol": "cliente",
+    "Cliente": "Hotel Aloft Bogota Airport"
+  },
+  {
+    "Nombre": "SANAR Y CURAR IPS S.A.S.",
+    "Password": "abc.1234",
+    "Correo": "sistemas@sanarycurarips.com.co",
+    "Rol": "cliente",
+    "Cliente": "SANAR Y CURAR IPS S.A.S."
+  },
+  {
+    "Nombre": "Hotel Casa del Gobernador",
+    "Password": "abc.1234",
+    "Correo": "contable@casadelgobernador.co",
+    "Rol": "cliente",
+    "Cliente": "Hotel Casa del Gobernador"
+  },
+  {
+    "Nombre": "SANAR Y CURAR IPS S.A.S",
+    "Password": "abc.1234",
+    "Correo": "sistemas@sanarycurarips.com.co",
+    "Rol": "cliente",
+    "Cliente": "SANAR Y CURAR IPS S.A.S"
+  },
+  {
+    "Nombre": "FUNDACIÓN SEMBRANDO FUTURO - SEMFU",
+    "Password": "abc.1234",
+    "Correo": "admonsemfuturo@gmail.com",
+    "Rol": "cliente",
+    "Cliente": "FUNDACION SEMBRANDO FUTURO - SEMFU"
+  },
+  {
+    "Nombre": "Hotel Casa Suto S.A.S",
+    "Password": "abc.1234",
+    "Correo": "jotoya@sismacorporation.com",
+    "Rol": "cliente",
+    "Cliente": "Hotel Casa Suto S.A.S"
+  },
+  {
+    "Nombre": "FNS ROOMS COLOMBIA S.A.S. ",
+    "Password": "abc.1234",
+    "Correo": "fnscolombia@fnsrooms.com",
+    "Rol": "cliente",
+    "Cliente": "FNS ROOMS COLOMBIA S.A.S. "
+  },
+  {
+    "Nombre": "BALAENA PANAMMA (PEDASI)",
+    "Password": "abc.1234",
+    "Correo": "cristal.mejias@fridama.com",
+    "Rol": "cliente",
+    "Cliente": "BALAENA PANAMMA (PEDASI)"
+  }
+]
