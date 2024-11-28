@@ -10,6 +10,7 @@ namespace ApiConsola.Interfaces.ConexionHuellero
         Task<ApiResponseDTO> ObtenerRegistrosAsistencia();
         Task<ApiResponseDTO> ObtenerRegistrosAsistenciaFiltrado(DateTime? fechaFiltrada);
         Task<ApiResponseDTO> AlimentarBase();
+        Task<ApiResponseDTO> BorrarRegistro(UsuarioBaseDTO? datos);
         string EstablecerFechaHoraDispositivo(DateTime nuevaFechaHora);
         Task<string> SincronizarFechaHoraConPC();
         void IniciarSincronizacionPeriodica(int intervaloSegundos);

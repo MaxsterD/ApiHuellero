@@ -7,10 +7,8 @@ using System.Text;
 using System.Text.Json;
 using ApiConsola.Interfaces;
 using ApiConsola.Services;
-using ApiConsola.Services.ConsultarTicket;
 using ApiConsola.Services.Http;
 using ApiConsola.Services.Interfaces;
-using ApiConsola.Services.CrearTicket;
 using ApiConsola.Interfaces.AsignarLideres;
 using ApiConsola.Services.AsignarLideres;
 using ApiConsola.Interfaces.CreacionUsuario;
@@ -86,18 +84,12 @@ builder.Services.AddDbContext<SqlServerDbContext>(options =>
 
 
 builder.Services.AddScoped<ISqlServerDbContext, SqlServerDbContext>();
-builder.Services.AddScoped<ICrearTicketService, CrearTicketService>();
 builder.Services.AddScoped<IUserServices, UserServices>();
 builder.Services.AddScoped<IAsignarLideresService, AsignarLideresService>();
 builder.Services.AddScoped<ICreacionUsuarioService, CreacionUsuarioService>();
 builder.Services.AddScoped<IHorariosService, HorariosService>();
 builder.Services.AddSingleton<IInfoDevice, InfoDeviceDTO>();
 builder.Services.AddScoped<IConexionHuelleroService, ConexionHuelleroService>();
-builder.Services.AddScoped<ITicketService, ConsultarTicketService>();
-builder.Services.AddScoped<ITicketByClienteService, ConsultarByClienteService>();
-builder.Services.AddScoped<ICrearComentarioService, CrearComentarioService>();
-builder.Services.AddScoped<ITicketStatusService, TicketStatusService>();
-builder.Services.AddScoped<ISeedService, SeedService>();
 builder.Services.AddScoped<IEnviarHttp, EnviarHttp>();
 
 var jwtKey = builder.Configuration["JWT:key"];

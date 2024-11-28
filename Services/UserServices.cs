@@ -159,22 +159,6 @@ namespace ApiConsola.Services
                 return response;
             }
         }
-
-        public async Task<CreateResponse> Actualizar(UpdateDTO user)
-        {
-            CreateResponse response = new CreateResponse();
-
-            byte[] saltBytes = GenerateSalt();
-            string passwordHash = GeneratePasswordHash(user.NewPassword, saltBytes);
-            string sql = "update [User].Informacion set  PasswordSalt = @PasswordSalt, PasswordHash = @PasswordHash where Email = @Email";
-            var parametros = new {passwordHash = passwordHash, PasswordSalt = Convert.ToBase64String(saltBytes), Email = user.Email };
-            int rowsAffected = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, parametros);
-
-            response.Success = rowsAffected > 0;
-            response.Message = "Contraseña actualizada con éxito, vuelva a iniciar sesión";
-
-            return response;
-        }
         
         private async Task<bool> Validar(NewUsuarioDTO login)
         {

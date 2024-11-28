@@ -1,6 +1,7 @@
 ﻿using ApiConsola.Interfaces.ConexionHuellero;
 using ApiConsola.Services.DTOs.ConexionHuellero;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApiConsola.Controllers
 {
@@ -67,6 +68,14 @@ namespace ApiConsola.Controllers
         public async Task<IActionResult> AlimentarBase()
         {
             var response = await _conexionHuellero.AlimentarBase();
+
+            return Ok(response);
+        }
+        
+        [HttpPost("BorrarRegistro")]
+        public async Task<IActionResult> BorrarRegistro(UsuarioBaseDTO? datos)
+        {
+            var response = await _conexionHuellero.BorrarRegistro(datos);
 
             return Ok(response);
         }

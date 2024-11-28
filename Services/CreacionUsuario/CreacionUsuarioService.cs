@@ -54,10 +54,10 @@ namespace ApiConsola.Services.CreacionUsuario
             return response.ToList();
         }
 
-        public async Task<List<UsuarioDTO?>?> ListarUsuarios()
+        public async Task<List<UsuarioDTO?>?> ListarUsuarios(UsuarioDTO? datos)
         {
-            string sql = $"SELECT * FROM [Datos].Usuarios order by id desc";
-            var response = await _sqlServerDbContext.Database.GetDbConnection().QueryAsync<UsuarioDTO?>(sql);
+            string sql = $"SELECT * FROM [Datos].Usuarios where (identificacion like '%' + @identificacion + '%' or @identificacion is null ) and (nombre like '%' + @nombre + '%' or  @nombre is null)";
+            var response = await _sqlServerDbContext.Database.GetDbConnection().QueryAsync<UsuarioDTO?>(sql, new { identificacion = datos.Identificacion, nombre = datos.Nombre });
             return response.ToList();
         }
 

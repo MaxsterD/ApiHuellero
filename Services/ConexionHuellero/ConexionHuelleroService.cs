@@ -9,6 +9,7 @@ using ApiConsola.Infrastructura.Data;
 using Dapper;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System;
+using static System.Net.Mime.MediaTypeNames;
 
 
 namespace ApiConsola.Services.ConexionHuellero
@@ -267,60 +268,6 @@ namespace ApiConsola.Services.ConexionHuellero
 
         }
 
-        public bool CrearUsuario(string nombre, string identificacion, string password, int privilege, bool enabled)
-        {
-            _device.EnableDevice(1, false);
-            //string nuevoId = ObtenerSiguienteIdUsuario(); // Generar el siguiente ID automáticamente
-
-            bool setUserInfo = _device.SSR_SetUserInfo(
-                1,               // Número de máquina
-                identificacion,          // ID generado
-                nombre,           // Nombre del usuario
-                password,         // Contraseña
-                privilege,        // Nivel de privilegio
-                enabled           // Estado del usuario
-            );
-
-            if (!setUserInfo)
-            {
-                int errorCode = 0;
-                _device.GetLastError(ref errorCode);
-                Console.WriteLine($"Error al crear el usuario. Código de error: {errorCode}");
-                _device.EnableDevice(1, true);
-
-                return false;
-
-            }
-
-            Console.WriteLine($"Usuario creado con éxito. ID: {identificacion}, Nombre: {nombre}");
-            
-            _device.EnableDevice(1, true);
-
-            return true;
-
-        }
-
-        private string ObtenerSiguienteIdUsuario()
-        {
-            int machineNumber = 1; // Número de la máquina
-            string userId = "";
-            string name = "";
-            string password = "";
-            int privilege = 0;
-            bool enabled = false;
-
-            int id = 1; // Comenzar desde el ID 1
-            while (true)
-            {
-                bool existe = _device.SSR_GetUserInfo(machineNumber, id.ToString(), out name, out password, out privilege, out enabled);
-                if (!existe) // Si no existe, este ID está disponible
-                {
-                    return id.ToString();
-                }
-                id++;
-            }
-        }
-
         public async Task<ApiResponseDTO> ObtenerRegistrosAsistenciaFiltrado(DateTime? fechaFiltrada)
         {
 
@@ -444,6 +391,120 @@ namespace ApiConsola.Services.ConexionHuellero
             }
 
             return res;
+        }
+
+        public async Task<ApiResponseDTO> BorrarRegistro(UsuarioBaseDTO? datos)
+        {
+            var sql = "";
+            ApiResponseDTO res = new ApiResponseDTO();
+
+            if (ValidarConexion() != "Conectado al dispositivo")
+            {
+                return new ApiResponseDTO() { Success = false, Message = $"No se ha establecido una conexion previa con el dispositivo" };
+            }
+            
+            if (datos?.IdEntrada is not null && datos?.IdSalida is null)
+            {
+                res.Message = $"Se ha eliminado el registro de entrada";
+
+                sql = $"DELETE FROM [Datos].Entradas where Id = @id and IdUsuario = @idUsuario";
+                var response = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { id = datos.IdEntrada, idUsuario = datos.IdUsuario });
+                res.Success = response > 0;
+                if(response > 0)
+                {
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = response.ToString();
+                    return res;
+                }
+                
+            }
+            else if (datos?.IdEntrada is null && datos?.IdSalida is not null)
+            {
+                res.Message = $"Se ha eliminado el registro de salida";
+
+                sql = $"DELETE FROM [Datos].Salidas where Id = @id and IdUsuario = @idUsuario";
+                var response = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { id = datos.IdSalida, idUsuario = datos.IdUsuario });
+                res.Success = response > 0;
+                if (response > 0)
+                {
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = response.ToString();
+                    return res;
+                }
+
+            }
+            else if (datos?.IdEntrada is not null && datos?.IdSalida is not null)
+            {
+                res.Message = $"Se ha eliminado el registro de entrada y salida";
+
+                sql = $"DELETE FROM [Datos].Entradas where Id = @id and IdUsuario = @idUsuario";
+                var response = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { id = datos.IdEntrada, idUsuario = datos.IdUsuario });
+
+                sql = $"DELETE FROM [Datos].Salidas where Id = @id and IdUsuario = @idUsuario";
+                response = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { id = datos.IdSalida, idUsuario = datos.IdUsuario });
+                res.Success = response > 0;
+                if (response > 0)
+                {
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = response.ToString();
+                    return res;
+                }
+
+
+            }
+            else
+            {
+                return new ApiResponseDTO() { Success = false, Message = $"No se han recibido datos que borrar" };
+
+            }
+
+
+        }
+
+
+        public bool CrearUsuario(string nombre, string identificacion, string password, int privilege, bool enabled)
+        {
+            _device.EnableDevice(1, false);
+            //string nuevoId = ObtenerSiguienteIdUsuario(); // Generar el siguiente ID automáticamente
+
+            bool setUserInfo = _device.SSR_SetUserInfo(
+                1,               // Número de máquina
+                identificacion,          // ID generado
+                nombre,           // Nombre del usuario
+                password,         // Contraseña
+                privilege,        // Nivel de privilegio
+                enabled           // Estado del usuario
+            );
+
+            if (!setUserInfo)
+            {
+                int errorCode = 0;
+                _device.GetLastError(ref errorCode);
+                Console.WriteLine($"Error al crear el usuario. Código de error: {errorCode}");
+                _device.EnableDevice(1, true);
+
+                return false;
+
+            }
+
+            Console.WriteLine($"Usuario creado con éxito. ID: {identificacion}, Nombre: {nombre}");
+
+            _device.EnableDevice(1, true);
+
+            return true;
+
         }
 
         private string ValidarConexion()

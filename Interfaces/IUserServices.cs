@@ -8,7 +8,6 @@ namespace ApiConsola.Interfaces
         Task<CreateResponse> RegistrarUsuario(NewUsuarioDTO login);
         Task<CreateResponse> ActualizarUsuario(UpdateData login);
         Task<CreateResponse> BuscarUsuario(string email);
-        Task<CreateResponse> Actualizar(UpdateDTO data);
     }
 
     public class CreateResponse

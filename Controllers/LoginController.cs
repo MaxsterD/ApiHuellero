@@ -41,17 +41,6 @@ namespace ApiConsola.Controllers
             return BadRequest(new { Message = session.Message });
         }
 
-        [HttpPost("CambiarPassword")]
-        public async Task<IActionResult> CambiarPassword(UpdateDTO newData)
-        {
-            var session = await _createUserServices.Actualizar(newData);
-
-            if (session.Success)
-            {
-                return Ok(new { Message = session.Message });
-            }
-            return BadRequest(new { Message = "No se pudo actualizar la contraseña" });
-        }
 
         [HttpPatch("Actualizar")]
         public async Task<IActionResult> Actualizar(UpdateData newLogin)

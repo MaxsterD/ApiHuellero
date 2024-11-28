@@ -1,6 +1,7 @@
 ﻿using ApiConsola.Interfaces.AsignarLideres;
 using ApiConsola.Interfaces.CreacionUsuario;
 using ApiConsola.Services.DTOs;
+using ApiConsola.Services.DTOs.AsignarLideres;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiConsola.Controllers
@@ -41,9 +42,9 @@ namespace ApiConsola.Controllers
         }
 
         [HttpGet("ListarUsuarios")]
-        public async Task<IActionResult> ListarUsuarios()
+        public async Task<IActionResult> ListarUsuarios([FromQuery] UsuarioDTO? datos = null)
         {
-            var session = await _usuarioService.ListarUsuarios();
+            var session = await _usuarioService.ListarUsuarios(datos);
 
             if (session != null)
             {
