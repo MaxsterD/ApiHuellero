@@ -49,7 +49,7 @@ namespace ApiConsola.Services.CreacionUsuario
 
         public async Task<List<UsuarioDTO?>?> BuscarUsuario(UsuarioDTO? datos)
         {
-            string sql = $"SELECT * FROM [Datos].Usuarios where (identificacion like '%' + convert(varchar(50),identificacion) + '%' or @identificacion is null ) and (nombre like '%' + @nombre + '%' or  @nombre is null)";
+            string sql = $"SELECT * FROM [Datos].Usuarios where (identificacion like '%' + convert(varchar(50),@identificacion) + '%' or @identificacion is null ) and (nombre like '%' + @nombre + '%' or  @nombre is null)";
             var response = await _sqlServerDbContext.Database.GetDbConnection().QueryAsync<UsuarioDTO?>(sql, new { identificacion = datos.Identificacion, nombre = datos.Nombre });
             return response.ToList();
         }

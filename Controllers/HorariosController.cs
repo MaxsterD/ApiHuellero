@@ -1,4 +1,5 @@
 ﻿using ApiConsola.Interfaces.CreacionUsuario;
+using ApiConsola.Interfaces.Horarios;
 using ApiConsola.Services.DTOs.Horarios;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,10 +28,10 @@ namespace ApiConsola.Controllers
             return BadRequest(new { Message = "No fue posible crear el horario" });
         }
 
-        [HttpGet("BuscarHorario")]
-        public async Task<IActionResult> BuscarHorario(HorariosDTO datos)
+        [HttpGet("BuscarHorarios")]
+        public async Task<IActionResult> BuscarHorarios(HorariosDTO datos)
         {
-            var session = await _horariosService.BuscarHorario(datos);
+            var session = await _horariosService.BuscarHorarios(datos);
 
             if (session != null)
             {

@@ -15,6 +15,14 @@ using ApiConsola.Interfaces.AsignarLideres;
 using ApiConsola.Services.AsignarLideres;
 using ApiConsola.Interfaces.CreacionUsuario;
 using ApiConsola.Services.CreacionUsuario;
+using ApiConsola.Interfaces.Horarios;
+using ApiConsola.Services.Horarios;
+using ApiConsola.Services.DTOs.InfoDevice;
+using ApiConsola.Services.ConexionHuellero;
+using ApiConsola.Interfaces.ConexionHuellero;
+using ApiConsola;
+using Microsoft.Data.SqlClient;
+using System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,16 +74,25 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+
 builder.Services.AddDbContext<SqlServerDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("Consola"));
 });
+
+
+
+//builder.Services.AddHostedService<ActualizarFechaBackground>(); // Aquí es donde lo registras
+
 
 builder.Services.AddScoped<ISqlServerDbContext, SqlServerDbContext>();
 builder.Services.AddScoped<ICrearTicketService, CrearTicketService>();
 builder.Services.AddScoped<IUserServices, UserServices>();
 builder.Services.AddScoped<IAsignarLideresService, AsignarLideresService>();
 builder.Services.AddScoped<ICreacionUsuarioService, CreacionUsuarioService>();
+builder.Services.AddScoped<IHorariosService, HorariosService>();
+builder.Services.AddSingleton<IInfoDevice, InfoDeviceDTO>();
+builder.Services.AddScoped<IConexionHuelleroService, ConexionHuelleroService>();
 builder.Services.AddScoped<ITicketService, ConsultarTicketService>();
 builder.Services.AddScoped<ITicketByClienteService, ConsultarByClienteService>();
 builder.Services.AddScoped<ICrearComentarioService, CrearComentarioService>();
@@ -108,6 +125,12 @@ else
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var conexionHuelleroService = scope.ServiceProvider.GetRequiredService<IConexionHuelleroService>();
+    await conexionHuelleroService.ConectarDispositivo();
+    conexionHuelleroService.IniciarSincronizacionPeriodica(60);
+}
 
 app.UseCors("AllowSwaggerUI");
 app.UseSwagger();
