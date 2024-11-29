@@ -9,5 +9,6 @@ namespace ApiConsola.Interfaces.Horarios
         Task<List<HorariosDTO?>?> BuscarHorarios(HorariosDTO? datos);
         Task<List<HorariosDTO?>?> ListarHorarios();
         Task<ApiResponseDTO> EliminarHorario(int idHorario);
+        Task<ApiResponseDTO> ActualizarHorario(HorariosDTO? datos);
     }
 }

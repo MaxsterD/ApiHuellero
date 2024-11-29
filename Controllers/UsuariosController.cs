@@ -30,7 +30,7 @@ namespace ApiConsola.Controllers
         }
 
         [HttpGet("BuscarUsuario")]
-        public async Task<IActionResult> BuscarUsuario(UsuarioDTO datos)
+        public async Task<IActionResult> BuscarUsuario([FromQuery] UsuarioDTO? datos = null)
         {
             var session = await _usuarioService.BuscarUsuario(datos);
 
@@ -42,9 +42,9 @@ namespace ApiConsola.Controllers
         }
 
         [HttpGet("ListarUsuarios")]
-        public async Task<IActionResult> ListarUsuarios([FromQuery] UsuarioDTO? datos = null)
+        public async Task<IActionResult> ListarUsuarios()
         {
-            var session = await _usuarioService.ListarUsuarios(datos);
+            var session = await _usuarioService.ListarUsuarios();
 
             if (session != null)
             {
@@ -57,6 +57,18 @@ namespace ApiConsola.Controllers
         public async Task<IActionResult> EliminarUsuario(UsuarioDTO datos)
         {
             var session = await _usuarioService.EliminarUsuario((int)datos.Id);
+
+            if (session != null)
+            {
+                return Ok(session);
+            }
+            return BadRequest(new { Message = "No existen usuarios creados" });
+        }
+
+        [HttpPost("ActualizarUsuario")]
+        public async Task<IActionResult> ActualizarUsuario(UsuarioDTO? datos)
+        {
+            var session = await _usuarioService.ActualizarUsuario(datos);
 
             if (session != null)
             {

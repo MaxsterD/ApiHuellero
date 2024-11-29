@@ -21,6 +21,10 @@ using ApiConsola.Interfaces.ConexionHuellero;
 using ApiConsola;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using ApiConsola.Interfaces.AsignarHorario;
+using ApiConsola.Services.AsignarHorario;
+using ApiConsola.Interfaces.Parametros;
+using ApiConsola.Services.Parametros;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -91,6 +95,8 @@ builder.Services.AddScoped<IHorariosService, HorariosService>();
 builder.Services.AddSingleton<IInfoDevice, InfoDeviceDTO>();
 builder.Services.AddScoped<IConexionHuelleroService, ConexionHuelleroService>();
 builder.Services.AddScoped<IEnviarHttp, EnviarHttp>();
+builder.Services.AddScoped<IAsignarHorarioService, AsignarHorarioService>();
+builder.Services.AddScoped<IParametrosService, ParametrosService>();
 
 var jwtKey = builder.Configuration["JWT:key"];
 var encryptionKey = builder.Configuration["JWT:encryptionKey"];
@@ -117,12 +123,6 @@ else
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var conexionHuelleroService = scope.ServiceProvider.GetRequiredService<IConexionHuelleroService>();
-    await conexionHuelleroService.ConectarDispositivo();
-    conexionHuelleroService.IniciarSincronizacionPeriodica(60);
-}
 
 app.UseCors("AllowSwaggerUI");
 app.UseSwagger();
@@ -187,5 +187,14 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var conexionHuelleroService = scope.ServiceProvider.GetRequiredService<IConexionHuelleroService>();
+    await conexionHuelleroService.ConectarDispositivo();
+    conexionHuelleroService.IniciarSincronizacionPeriodica(60);
+}
+
 
 app.Run();

@@ -10,6 +10,9 @@ using Dapper;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System;
 using static System.Net.Mime.MediaTypeNames;
+using System.Text;
+using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 
 
 namespace ApiConsola.Services.ConexionHuellero
@@ -34,9 +37,12 @@ namespace ApiConsola.Services.ConexionHuellero
 
         public async Task<ApiResponseDTO> ConectarDispositivo()
         {
-            string sql = "SELECT * FROM [Configuracion].dispositivo ";
+            string sql = @$"SELECT 
+                            MAX(CASE WHEN Parametro = 'Direccion ip del huellero' THEN Value END) AS Ip,
+                            MAX(CASE WHEN Parametro = 'Puerto del huellero' THEN Value END) AS Puerto
+                        FROM Configuracion.Parametros
+                        WHERE Parametro IN ('Direccion ip del huellero', 'Puerto del huellero'); ";
             var configuracionHuellero = await _sqlServerDbContext.Database.GetDbConnection().QueryFirstOrDefaultAsync<DispositivoDTO?>(sql);
-
             bool passwordSet = _device.SetCommPassword(commPassword);
             if (!passwordSet)
             {
@@ -76,6 +82,8 @@ namespace ApiConsola.Services.ConexionHuellero
             }
 
             Console.WriteLine("Monitoreando eventos de asistencia en tiempo real...");
+
+            //_device.PlayVoice(5,4); //emitir sonido
 
             return new ApiResponseDTO() { Success = true, Message = $"Dispositivo conectado exitosamente." };
 
@@ -120,7 +128,7 @@ namespace ApiConsola.Services.ConexionHuellero
                                     Configuracion.Parametros P ON P.Id = 1
                                 WHERE
                                     E.Hora BETWEEN DATEADD(MINUTE, -CONVERT(bigint, P.Value), H.HoraInicio) 
-                                             AND DATEADD(MINUTE, CONVERT(bigint, P.Value), H.HoraFin)
+                                             AND DATEADD(MINUTE, CONVERT(bigint, P.Value), H.HoraInicio)
                                     AND (E.IdUsuario = @idUsuario or @idUsuario is null)
                                     AND ((E.Fecha BETWEEN @FechaInicio and @FechaFin) or (@FechaInicio is null and @FechaFin is null))
                             ),
@@ -151,7 +159,7 @@ namespace ApiConsola.Services.ConexionHuellero
                                 JOIN 
                                     Configuracion.Parametros P ON P.Id = 1 
                                 WHERE
-                                    S.Hora BETWEEN DATEADD(MINUTE, -CONVERT(bigint, P.Value), H.HoraInicio) 
+                                    S.Hora BETWEEN DATEADD(MINUTE, -CONVERT(bigint, P.Value), H.HoraFin) 
                                              AND DATEADD(MINUTE, CONVERT(bigint, P.Value), H.HoraFin)
                                     AND (S.IdUsuario = @idUsuario or @idUsuario is null)
                                     AND ((S.Fecha BETWEEN @FechaInicio and @FechaFin) or (@FechaInicio is null and @FechaFin is null))
@@ -171,7 +179,7 @@ namespace ApiConsola.Services.ConexionHuellero
                                 (u.Tipo_Identificacion + CONVERT(VARCHAR(MAX), u.Identificacion) + ' - ' + u.Nombre) AS Empleado
                             FROM 
                                 CTE_Entradas e
-                            LEFT JOIN 
+                            FULL OUTER JOIN 
                                 CTE_Salidas s ON e.IdUsuario = s.IdUsuario 
                                              AND e.IdHorario = s.IdHorario 
                                              AND e.Fecha = s.Fecha
@@ -181,7 +189,7 @@ namespace ApiConsola.Services.ConexionHuellero
                                 (e.RowNum = 1 OR e.RowNum IS NULL)
                                 AND (s.RowNum = 1 OR s.RowNum IS NULL)
                             ORDER BY 
-                                e.IdUsuario, e.IdHorario, e.Fecha;";
+                                ISNULL(e.IdUsuario, s.IdUsuario), ISNULL(e.IdHorario, s.IdHorario), ISNULL(e.Fecha, s.Fecha);";
             var usuarios = await _sqlServerDbContext.Database.GetDbConnection().QueryAsync<UsuarioBaseDTO?>(sql, new { idUsuario = datos?.IdUsuario, fechaInicio = datos?.FechaInicio, fechaFin = datos?.FechaFin });
 
             res.Data = usuarios.ToList();
@@ -199,6 +207,9 @@ namespace ApiConsola.Services.ConexionHuellero
                 return new ApiResponseDTO() { Success = false, Message = $"No se ha establecido una conexion previa con el dispositivo" };
             }
             ApiResponseDTO res = new ApiResponseDTO() { Success = true, Message = $"Informacion almacenada en la base correctamente." };
+
+            string filePath = "/home/pi/RegistrosHuellero.txt"; // Ruta del archivo en tu Raspberry Pi
+            StringBuilder fileContent = new StringBuilder();
 
             string userID = "";
             int verifyMode = 0;
@@ -246,6 +257,9 @@ namespace ApiConsola.Services.ConexionHuellero
                     //return new ApiResponseDTO() { Success = response > 0, Message = $"Usuario creado con exito!", Data = response };
                 }
 
+                fileContent.AppendLine($"{nuevoUsuario.IdUsuario},{nuevoUsuario.Nombre},{nuevoUsuario.Fecha},{nuevoUsuario.Tipo}");
+
+
             }
 
             bool deleteSuccess = _device.ClearGLog(machineNumber); // Eliminar los registros
@@ -256,10 +270,62 @@ namespace ApiConsola.Services.ConexionHuellero
                 return res;
             }
 
-            if(nuevoUsuario is null)
+            if((nuevoUsuario.IdUsuario is null && nuevoUsuario.Nombre is null && nuevoUsuario.Fecha is null && nuevoUsuario.Tipo is null ) || fileContent.Length == 0)
             {
                 res.Message = $"No hubo informacion que almacenar";
+                res.Data = nuevoUsuario;
 
+                return res;
+            }
+
+            // Conexión y escritura del archivo en la Raspberry Pi usando SFTP
+            string sqlR = @$"SELECT 
+                                MAX(CASE WHEN Parametro = 'Direccion ip Raspberry' THEN Value END) AS Host,
+                                MAX(CASE WHEN Parametro = 'Usuario Raspberry' THEN Value END) AS Usuario,
+	                            MAX(CASE WHEN Parametro = 'Contraseña Raspberry' THEN Value END) AS Contraseña
+                            FROM Configuracion.Parametros;";
+            var raspberry = await _sqlServerDbContext.Database.GetDbConnection().QueryFirstOrDefaultAsync<RaspberryDTO?>(sqlR);
+            
+            string remoteFilePath = "/home/pi/RegistrosHuellero.txt"; // Ruta del archivo en la Raspberry Pi
+
+            if (!string.IsNullOrEmpty(raspberry.Host))
+            {
+                try
+                {
+                    using (var client = new Renci.SshNet.SftpClient(raspberry.Host, raspberry.Usuario, raspberry.Contraseña))
+                    {
+                        client.Connect();
+
+                        // Verificar si el archivo ya existe
+                        if (client.Exists(remoteFilePath))
+                        {
+                            // Leer el contenido actual y añadir al final
+                            using (var stream = client.Open(remoteFilePath, FileMode.Append, FileAccess.Write))
+                            {
+                                using (var writer = new StreamWriter(stream))
+                                {
+                                    await writer.WriteAsync(fileContent.ToString());
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Crear un nuevo archivo y escribir el contenido
+                            using (var fileStream = new MemoryStream(Encoding.UTF8.GetBytes(fileContent.ToString())))
+                            {
+                                client.UploadFile(fileStream, remoteFilePath);
+                            }
+                        }
+
+                        client.Disconnect();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    res.Success = false;
+                    res.Message = $"Error al guardar el archivo en la Raspberry Pi: {ex.Message}";
+                    return res;
+                }
             }
 
             res.Data = nuevoUsuario;
@@ -473,29 +539,21 @@ namespace ApiConsola.Services.ConexionHuellero
 
         }
 
-
-        public bool CrearUsuario(string nombre, string identificacion, string password, int privilege, bool enabled)
+        public async Task<ApiResponseDTO> CrearUsuario(string nombre, string identificacion, string password, int privilege = 0, bool enabled = true)
         {
+            ApiResponseDTO res = new ApiResponseDTO();
+
             _device.EnableDevice(1, false);
-            //string nuevoId = ObtenerSiguienteIdUsuario(); // Generar el siguiente ID automáticamente
-
-            bool setUserInfo = _device.SSR_SetUserInfo(
-                1,               // Número de máquina
-                identificacion,          // ID generado
-                nombre,           // Nombre del usuario
-                password,         // Contraseña
-                privilege,        // Nivel de privilegio
-                enabled           // Estado del usuario
-            );
-
+            bool setUserInfo = _device.SetUserInfo(1,11,@$"{identificacion}-{nombre}" ,password,privilege,enabled);
             if (!setUserInfo)
             {
                 int errorCode = 0;
                 _device.GetLastError(ref errorCode);
                 Console.WriteLine($"Error al crear el usuario. Código de error: {errorCode}");
                 _device.EnableDevice(1, true);
-
-                return false;
+                res.Success = false;
+                res.Message = $"Error al crear el usuario. Código de error: {errorCode}";
+                return res;
 
             }
 
@@ -503,7 +561,9 @@ namespace ApiConsola.Services.ConexionHuellero
 
             _device.EnableDevice(1, true);
 
-            return true;
+            res.Success = true;
+            res.Message = $"Usuario creado con éxito. ID: {1}, Nombre: {identificacion}-{nombre}";
+            return res;
 
         }
 

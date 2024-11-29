@@ -29,7 +29,7 @@ namespace ApiConsola.Controllers
         }
 
         [HttpGet("BuscarHorarios")]
-        public async Task<IActionResult> BuscarHorarios(HorariosDTO datos)
+        public async Task<IActionResult> BuscarHorarios([FromQuery] HorariosDTO? datos = null)
         {
             var session = await _horariosService.BuscarHorarios(datos);
 
@@ -37,7 +37,7 @@ namespace ApiConsola.Controllers
             {
                 return Ok(session);
             }
-            return BadRequest(new { Message = "No existen el horario" });
+            return BadRequest(new { Message = "No existe el horario" });
         }
 
         [HttpGet("ListarHorarios")]
@@ -61,7 +61,19 @@ namespace ApiConsola.Controllers
             {
                 return Ok(session);
             }
-            return BadRequest(new { Message = "No existen horarios creados" });
+            return BadRequest(new { Message = "No existen el horarios a eliminar" });
+        }
+
+        [HttpPost("ActualizarHorario")]
+        public async Task<IActionResult> ActualizarHorario(HorariosDTO? datos)
+        {
+            var session = await _horariosService.ActualizarHorario(datos);
+
+            if (session != null)
+            {
+                return Ok(session);
+            }
+            return BadRequest(new { Message = "No existe el horarios a actualizar" });
         }
     }
 }

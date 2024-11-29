@@ -8,7 +8,7 @@ namespace ApiConsola
     {
         private readonly ILogger<ActualizarFechaBackground> _logger;
         private readonly IConexionHuelleroService _conexionHuellero;
-        private readonly int _intervaloSegundos = 10; // Intervalo de tiempo en segundos
+        private readonly int _intervaloSegundos = 60; // Intervalo de tiempo en segundos
 
         public ActualizarFechaBackground(ILogger<ActualizarFechaBackground> logger, IConexionHuelleroService conexionHuellero)
         {
@@ -23,6 +23,7 @@ namespace ApiConsola
             {
                 try
                 {
+                    await _conexionHuellero.ConectarDispositivo();
                     await _conexionHuellero.SincronizarFechaHoraConPC();
                     _logger.LogInformation("Ejecutando cron job a las {time}", DateTimeOffset.Now);
 

@@ -79,5 +79,13 @@ namespace ApiConsola.Controllers
 
             return Ok(response);
         }
+        
+        [HttpPost("CrearUsuario")]
+        public async Task<IActionResult> CrearUsuario(string nombre, string identificacion, string password, int privilege = 0, bool enabled = true)
+        {
+            var response = await _conexionHuellero.CrearUsuario(nombre, identificacion, password, privilege, enabled);
+
+            return Ok(response);
+        }
     }
 }
