@@ -32,6 +32,43 @@ namespace ApiConsola.Services.AsignarLideres
             return response.ToList(); 
         }
 
+        public async Task<ApiResponseDTO> Guardar(AsignarLideresDTO? datos)
+        {
+
+            if (datos.IdLider == datos.IdEmpleado)
+            {
+                return new ApiResponseDTO() { Success = false, Message = $"El lider no puede ser su mismo empleado"};
+
+            }
+            else
+            {
+                string sql = "SELECT * FROM [Datos].LiderEmpleados where IdLider = @idLider and IdEmpleado = @idEmpleado";
+                var responseVerif = await _sqlServerDbContext.Database.GetDbConnection().QueryFirstOrDefaultAsync<UsuarioDTO?>(sql, new { idLider = datos.IdLider, idEmpleado = datos.IdEmpleado });
+
+
+                if (responseVerif == null)
+                {
+                    try
+                    {
+                        sql = "INSERT INTO [Datos].LiderEmpleados (IdLider,IdEmpleado) VALUES (@idLider,@idEmpleado)";
+                        var response = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { idLider = datos.IdLider, idEmpleado = datos.IdEmpleado });
+                        return new ApiResponseDTO() { Success = response > 0, Message = $"Usuario asignado a lider con exito!", Data = response };
+                    }
+                    catch (Exception e)
+                    {
+
+                        return new ApiResponseDTO { Success = false, Message = e.Message };
+
+                    }
+                }
+                else
+                {
+                    return new ApiResponseDTO() { Success = false, Message = $"Este usuario ya se encuentra asignado a un lider!" };
+                }
+            }
+
+        }
+
         public async Task<List<TiposIdentificacionDTO>> ListarIdentificacion()
         {
             string sql = "SELECT * FROM [Seleccion].tipos_identificacion";
@@ -39,6 +76,7 @@ namespace ApiConsola.Services.AsignarLideres
             return response.ToList();
         }
 
-        
+
+
     }
 }

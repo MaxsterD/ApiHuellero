@@ -3,7 +3,7 @@ using ApiConsola.Services.DTOs.ConexionHuellero;
 
 namespace ApiConsola.Interfaces.ConexionHuellero
 {
-    public interface IConexionHuelleroService
+    public interface IHuelleroService
     {
         Task<ApiResponseDTO> ConectarDispositivo();
         Task<ApiResponseDTO> RecibirDatos(FiltroDatosDTO? datos);

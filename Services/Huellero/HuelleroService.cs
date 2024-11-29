@@ -17,7 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace ApiConsola.Services.ConexionHuellero
 {
-    public class ConexionHuelleroService : IConexionHuelleroService
+    public class HuelleroService : IHuelleroService
     {
         private CZKEM _device;
         private int commPassword = 232425;
@@ -27,7 +27,7 @@ namespace ApiConsola.Services.ConexionHuellero
         private readonly IInfoDevice _infoDevice;
         private readonly ISqlServerDbContext _sqlServerDbContext;
 
-        public ConexionHuelleroService(IInfoDevice infoDevice , ISqlServerDbContext sqlServerDbContext)
+        public HuelleroService(IInfoDevice infoDevice , ISqlServerDbContext sqlServerDbContext)
         {
             _infoDevice = infoDevice;
             _device = new zkemkeeper.CZKEM();
@@ -229,7 +229,7 @@ namespace ApiConsola.Services.ConexionHuellero
 
                 DateTime fechaRegistro = new DateTime(year, month, day);
 
-                hasRecords = true;
+                
 
                 nuevoUsuario = new UsuarioHuelleroDTO
                 {
@@ -246,12 +246,14 @@ namespace ApiConsola.Services.ConexionHuellero
                 // Agregar el nuevo usuario a la lista
                 if (nuevoUsuario.Tipo == "Entrada")
                 {
+                    hasRecords = true;
                     sql = "INSERT INTO [Datos].Entradas (IdUsuario,Fecha,Hora) VALUES (@idUsuario,@fechaEntrada,@horaEntrada)";
                     var response = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { idUsuario = IdUsuario, horaEntrada = $"{hour}:{minute}:{second}", fechaEntrada = $"{year}-{month}-{day}" });
                     //return new ApiResponseDTO() { Success = response > 0, Message = $"Usuario creado con exito!", Data = response };
                 }
                 else if (nuevoUsuario.Tipo == "Salida")
                 {
+                    hasRecords = true;
                     sql = "INSERT INTO [Datos].Salidas (IdUsuario,Fecha,Hora) VALUES (@idUsuario,@fechaSalida,@horaSalida)";
                     var response = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { idUsuario = IdUsuario, horaSalida = $"{hour}:{minute}:{second}", fechaSalida = $"{year}-{month}-{day}" });
                     //return new ApiResponseDTO() { Success = response > 0, Message = $"Usuario creado con exito!", Data = response };
@@ -270,7 +272,9 @@ namespace ApiConsola.Services.ConexionHuellero
                 return res;
             }
 
-            if((nuevoUsuario.IdUsuario is null && nuevoUsuario.Nombre is null && nuevoUsuario.Fecha is null && nuevoUsuario.Tipo is null ) || fileContent.Length == 0)
+
+
+            if(!hasRecords)
             {
                 res.Message = $"No hubo informacion que almacenar";
                 res.Data = nuevoUsuario;
@@ -468,19 +472,15 @@ namespace ApiConsola.Services.ConexionHuellero
             {
                 return new ApiResponseDTO() { Success = false, Message = $"No se ha establecido una conexion previa con el dispositivo" };
             }
-            
+
             if (datos?.IdEntrada is not null && datos?.IdSalida is null)
             {
-                res.Message = $"Se ha eliminado el registro de entrada";
+                res.Message += $"Se ha eliminado el registro de entrada /";
 
                 sql = $"DELETE FROM [Datos].Entradas where Id = @id and IdUsuario = @idUsuario";
                 var response = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { id = datos.IdEntrada, idUsuario = datos.IdUsuario });
                 res.Success = response > 0;
-                if(response > 0)
-                {
-                    return res;
-                }
-                else
+                if(!(response > 0))
                 {
                     res.Success = false;
                     res.Message = response.ToString();
@@ -490,16 +490,12 @@ namespace ApiConsola.Services.ConexionHuellero
             }
             else if (datos?.IdEntrada is null && datos?.IdSalida is not null)
             {
-                res.Message = $"Se ha eliminado el registro de salida";
+                res.Message += $" Se ha eliminado el registro de salida";
 
                 sql = $"DELETE FROM [Datos].Salidas where Id = @id and IdUsuario = @idUsuario";
                 var response = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { id = datos.IdSalida, idUsuario = datos.IdUsuario });
                 res.Success = response > 0;
-                if (response > 0)
-                {
-                    return res;
-                }
-                else
+                if (!(response > 0))
                 {
                     res.Success = false;
                     res.Message = response.ToString();
@@ -519,10 +515,6 @@ namespace ApiConsola.Services.ConexionHuellero
                 res.Success = response > 0;
                 if (response > 0)
                 {
-                    return res;
-                }
-                else
-                {
                     res.Success = false;
                     res.Message = response.ToString();
                     return res;
@@ -530,11 +522,15 @@ namespace ApiConsola.Services.ConexionHuellero
 
 
             }
-            else
+            else if (datos?.IdEntrada is null && datos?.IdSalida is null)
             {
                 return new ApiResponseDTO() { Success = false, Message = $"No se han recibido datos que borrar" };
 
             }
+            
+
+            return res;
+
 
 
         }

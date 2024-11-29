@@ -7,10 +7,10 @@ namespace ApiConsola
     public class ActualizarFechaBackground : BackgroundService
     {
         private readonly ILogger<ActualizarFechaBackground> _logger;
-        private readonly IConexionHuelleroService _conexionHuellero;
+        private readonly IHuelleroService _conexionHuellero;
         private readonly int _intervaloSegundos = 60; // Intervalo de tiempo en segundos
 
-        public ActualizarFechaBackground(ILogger<ActualizarFechaBackground> logger, IConexionHuelleroService conexionHuellero)
+        public ActualizarFechaBackground(ILogger<ActualizarFechaBackground> logger, IHuelleroService conexionHuellero)
         {
             _logger = logger;
             _conexionHuellero = conexionHuellero;

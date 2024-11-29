@@ -93,7 +93,7 @@ builder.Services.AddScoped<IAsignarLideresService, AsignarLideresService>();
 builder.Services.AddScoped<ICreacionUsuarioService, CreacionUsuarioService>();
 builder.Services.AddScoped<IHorariosService, HorariosService>();
 builder.Services.AddSingleton<IInfoDevice, InfoDeviceDTO>();
-builder.Services.AddScoped<IConexionHuelleroService, ConexionHuelleroService>();
+builder.Services.AddScoped<IHuelleroService, HuelleroService>();
 builder.Services.AddScoped<IEnviarHttp, EnviarHttp>();
 builder.Services.AddScoped<IAsignarHorarioService, AsignarHorarioService>();
 builder.Services.AddScoped<IParametrosService, ParametrosService>();
@@ -191,7 +191,7 @@ app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {
-    var conexionHuelleroService = scope.ServiceProvider.GetRequiredService<IConexionHuelleroService>();
+    var conexionHuelleroService = scope.ServiceProvider.GetRequiredService<IHuelleroService>();
     await conexionHuelleroService.ConectarDispositivo();
     conexionHuelleroService.IniciarSincronizacionPeriodica(60);
 }

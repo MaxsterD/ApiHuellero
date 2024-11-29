@@ -7,11 +7,11 @@ namespace ApiConsola.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ConectarHuelleroController : ControllerBase
+    public class HuelleroController : ControllerBase
     {
-        private readonly IConexionHuelleroService _conexionHuellero;
+        private readonly IHuelleroService _conexionHuellero;
 
-        public ConectarHuelleroController(IConexionHuelleroService conexionHuellero)
+        public HuelleroController(IHuelleroService conexionHuellero)
         {
             _conexionHuellero = conexionHuellero;
         }
