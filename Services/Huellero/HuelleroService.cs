@@ -13,6 +13,7 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Text;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Renci.SshNet.Messages;
 
 
 namespace ApiConsola.Services.ConexionHuellero
@@ -92,10 +93,6 @@ namespace ApiConsola.Services.ConexionHuellero
 
         public async Task<ApiResponseDTO> RecibirDatos(FiltroDatosDTO? datos)
         {
-            if (ValidarConexion() != "Conectado al dispositivo")
-            {
-                return new ApiResponseDTO() { Success = false, Message = $"No se ha establecido una conexion previa con el dispositivo" };
-            }
 
             ApiResponseDTO res = new ApiResponseDTO() { Success = true, Message = $"Usuarios cargados exitosamente." };
 
@@ -168,10 +165,10 @@ namespace ApiConsola.Services.ConexionHuellero
                                 ISNULL(e.IdUsuario, s.IdUsuario) AS IdUsuario,
                                 ISNULL(e.IdHorario, s.IdHorario) AS IdHorario,
                                 ISNULL(e.Fecha, s.Fecha) AS Fecha,
-                                e.HoraEntrada,
+                                CONVERT(VARCHAR(8), CONVERT(TIME, e.HoraEntrada), 108) AS HoraEntrada,
                                 e.EstadoEntrada,
                                 e.IdEntrada,
-                                s.HoraSalida,
+                                CONVERT(VARCHAR(8), CONVERT(TIME, s.HoraSalida), 108) AS HoraSalida,
                                 s.EstadoSalida,
                                 s.IdSalida,
                                 e.HoraInicio,
@@ -198,6 +195,72 @@ namespace ApiConsola.Services.ConexionHuellero
 
         }
 
+        public async Task<ApiResponseDTO> ArchivoRaspBerry(string datos)
+        {
+            StringBuilder fileContent = new StringBuilder();
+            ApiResponseDTO res = new ApiResponseDTO();
+
+            fileContent.AppendLine(datos);
+
+
+            string sqlR = @$"SELECT 
+                                MAX(CASE WHEN Parametro = 'Direccion ip Raspberry' THEN Value END) AS Host,
+                                MAX(CASE WHEN Parametro = 'Usuario Raspberry' THEN Value END) AS Usuario,
+	                            MAX(CASE WHEN Parametro = 'Contraseña Raspberry' THEN Value END) AS Contraseña
+                            FROM Configuracion.Parametros;";
+            var raspberry = await _sqlServerDbContext.Database.GetDbConnection().QueryFirstOrDefaultAsync<RaspberryDTO?>(sqlR);
+
+            string remoteFilePath = $@"/home/{raspberry.Usuario}/RegistrosHuellero.txt"; // Ruta del archivo en la Raspberry Pi
+
+            if (!string.IsNullOrEmpty(raspberry.Host))
+            {
+                try
+                {
+                    using (var client = new Renci.SshNet.SftpClient(raspberry.Host, raspberry.Usuario, raspberry.Contraseña))
+                    {
+                        client.Connect();
+
+                        // Verificar si el archivo ya existe
+                        if (client.Exists(remoteFilePath))
+                        {
+                            // Leer el contenido actual y añadir al final
+                            using (var stream = client.Open(remoteFilePath, FileMode.Append, FileAccess.Write))
+                            {
+                                using (var writer = new StreamWriter(stream))
+                                {
+                                    await writer.WriteAsync(fileContent.ToString());
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Crear un nuevo archivo y escribir el contenido
+                            using (var fileStream = new MemoryStream(Encoding.UTF8.GetBytes(fileContent.ToString())))
+                            {
+                                client.UploadFile(fileStream, remoteFilePath);
+                            }
+                        }
+                        res.Success = true;
+                        res.Message = $"Informacion almacenada en la raspberry correctamente.";
+                        client.Disconnect();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    
+                }
+
+                return res;
+            }
+            else
+            {
+                res.Success = false;
+                res.Message = $"No hay una raspberry configurada";
+                return res;
+            }
+
+        }
+
         public async Task<ApiResponseDTO> AlimentarBase()
         {
             var sql = "";
@@ -208,7 +271,6 @@ namespace ApiConsola.Services.ConexionHuellero
             }
             ApiResponseDTO res = new ApiResponseDTO() { Success = true, Message = $"Informacion almacenada en la base correctamente." };
 
-            string filePath = "/home/pi/RegistrosHuellero.txt"; // Ruta del archivo en tu Raspberry Pi
             StringBuilder fileContent = new StringBuilder();
 
             string userID = "";
@@ -259,7 +321,7 @@ namespace ApiConsola.Services.ConexionHuellero
                     //return new ApiResponseDTO() { Success = response > 0, Message = $"Usuario creado con exito!", Data = response };
                 }
 
-                fileContent.AppendLine($"{nuevoUsuario.IdUsuario},{nuevoUsuario.Nombre},{nuevoUsuario.Fecha},{nuevoUsuario.Tipo}");
+                fileContent.AppendLine($"idUsuario = {nuevoUsuario.IdUsuario},nombre = {nuevoUsuario.Nombre},Fecha = {nuevoUsuario.Fecha},Tipo = {nuevoUsuario.Tipo}, Hora = {hour}:{minute}:{second}");
 
 
             }
@@ -290,7 +352,7 @@ namespace ApiConsola.Services.ConexionHuellero
                             FROM Configuracion.Parametros;";
             var raspberry = await _sqlServerDbContext.Database.GetDbConnection().QueryFirstOrDefaultAsync<RaspberryDTO?>(sqlR);
             
-            string remoteFilePath = "/home/pi/RegistrosHuellero.txt"; // Ruta del archivo en la Raspberry Pi
+            string remoteFilePath = $@"/home/{raspberry.Usuario}/RegistrosHuellero.txt"; // Ruta del archivo en la Raspberry Pi
 
             if (!string.IsNullOrEmpty(raspberry.Host))
             {
@@ -468,11 +530,6 @@ namespace ApiConsola.Services.ConexionHuellero
             var sql = "";
             ApiResponseDTO res = new ApiResponseDTO();
 
-            if (ValidarConexion() != "Conectado al dispositivo")
-            {
-                return new ApiResponseDTO() { Success = false, Message = $"No se ha establecido una conexion previa con el dispositivo" };
-            }
-
             if (datos?.IdEntrada is not null && datos?.IdSalida is null)
             {
                 res.Message += $"Se ha eliminado el registro de entrada /";
@@ -513,7 +570,7 @@ namespace ApiConsola.Services.ConexionHuellero
                 sql = $"DELETE FROM [Datos].Salidas where Id = @id and IdUsuario = @idUsuario";
                 response = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { id = datos.IdSalida, idUsuario = datos.IdUsuario });
                 res.Success = response > 0;
-                if (response > 0)
+                if (!(response > 0))
                 {
                     res.Success = false;
                     res.Message = response.ToString();
@@ -533,6 +590,80 @@ namespace ApiConsola.Services.ConexionHuellero
 
 
 
+        }
+
+        public async Task<ApiResponseDTO> ActualizarRegistro(UsuarioBaseDTO? datos)
+        {
+            try
+            {
+                var sql = "";
+                ApiResponseDTO res = new ApiResponseDTO();
+
+                if (datos?.IdEntrada is not null && datos?.IdSalida is null)
+                {
+                    res.Message += $"Se ha actualizado el registro de entrada /";
+
+                    sql = $"UPDATE [Datos].Entradas SET Hora = @horaEntrada where Id = @id and IdUsuario = @idUsuario";
+                    var response = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { id = datos.IdEntrada, idUsuario = datos.IdUsuario, horaEntrada = datos.HoraEntrada });
+                    res.Success = response > 0;
+                    if (!(response > 0))
+                    {
+                        res.Success = false;
+                        res.Message = response.ToString();
+                        return res;
+                    }
+
+                }
+                else if (datos?.IdEntrada is null && datos?.IdSalida is not null)
+                {
+                    res.Message += $" Se ha actualizado el registro de salida";
+
+                    sql = $"UPDATE [Datos].Salidas SET Hora = @horaSalida where Id = @id and IdUsuario = @idUsuario";
+                    var response = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { id = datos.IdSalida, idUsuario = datos.IdUsuario, horaSalida = datos.HoraSalida });
+                    res.Success = response > 0;
+                    if (!(response > 0))
+                    {
+                        res.Success = false;
+                        res.Message = response.ToString();
+                        return res;
+                    }
+
+                }
+                else if (datos?.IdEntrada is not null && datos?.IdSalida is not null)
+                {
+                    res.Message = $"Se ha actualizado el registro de entrada y salida";
+
+                    sql = $"UPDATE [Datos].Entradas SET Hora = @horaEntrada where Id = @id and IdUsuario = @idUsuario";
+                    var response = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { id = datos.IdEntrada, idUsuario = datos.IdUsuario, horaEntrada = datos.HoraEntrada });
+
+                    sql = $"UPDATE [Datos].Salidas SET Hora = @horaSalida where Id = @id and IdUsuario = @idUsuario";
+                    response = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { id = datos.IdSalida, idUsuario = datos.IdUsuario, horaSalida = datos.HoraSalida });
+                    res.Success = response > 0;
+                    if (!(response > 0))
+                    {
+                        res.Success = false;
+                        res.Message = response.ToString();
+                        return res;
+                    }
+
+
+                }
+                else if (datos?.IdEntrada is null && datos?.IdSalida is null)
+                {
+                    return new ApiResponseDTO() { Success = false, Message = $"No se han recibido datos que borrar" };
+
+                }
+
+                return res;
+
+
+            }
+            catch (Exception e)
+            {
+
+                return new ApiResponseDTO { Success = false, Message = e.Message };
+
+            }
         }
 
         public async Task<ApiResponseDTO> CrearUsuario(string nombre, string identificacion, string password, int privilege = 0, bool enabled = true)

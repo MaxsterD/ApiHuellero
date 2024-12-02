@@ -79,11 +79,28 @@ namespace ApiConsola.Controllers
 
             return Ok(response);
         }
-        
+
+        [HttpPost("ActualizarRegistro")]
+        public async Task<IActionResult> ActualizarRegistro(UsuarioBaseDTO? datos)
+        {
+            var response = await _conexionHuellero.ActualizarRegistro(datos);
+
+            return Ok(response);
+        }
+
+
         [HttpPost("CrearUsuario")]
         public async Task<IActionResult> CrearUsuario(string nombre, string identificacion, string password, int privilege = 0, bool enabled = true)
         {
             var response = await _conexionHuellero.CrearUsuario(nombre, identificacion, password, privilege, enabled);
+
+            return Ok(response);
+        }
+
+        [HttpGet("ArchivoRaspBerryPrueba")]
+        public async Task<IActionResult> ArchivoRaspBerry(string datos)
+        {
+            var response = await _conexionHuellero.ArchivoRaspBerry(datos);
 
             return Ok(response);
         }

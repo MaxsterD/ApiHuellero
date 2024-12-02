@@ -34,7 +34,9 @@ namespace ApiConsola.Services.AsignarLideres
 
         public async Task<ApiResponseDTO> Guardar(AsignarLideresDTO? datos)
         {
-
+            Console.WriteLine("datos");
+            Console.WriteLine(datos.IdLider);
+            Console.WriteLine(datos.IdEmpleado);
             if (datos.IdLider == datos.IdEmpleado)
             {
                 return new ApiResponseDTO() { Success = false, Message = $"El lider no puede ser su mismo empleado"};
@@ -67,6 +69,37 @@ namespace ApiConsola.Services.AsignarLideres
                 }
             }
 
+        }
+
+        public async Task<List<EmpleadosLideresDTO>> ListarEmpleadosLider(AsignarLideresDTO? datos)
+        {
+            string sql = @$"select le.Id,
+                                    le.IdLider,
+                                    le.IdEmpleado,
+                                    (u1.Tipo_Identificacion + CONVERT(VARCHAR(MAX), u1.Identificacion) + ' - ' + u1.Nombre) as NombreLider,
+                                    (u2.Tipo_Identificacion + CONVERT(VARCHAR(MAX), u2.Identificacion) + ' - ' + u2.Nombre) as NombreEmpleado 
+                                    from datos.LiderEmpleados LE
+                                    INNER JOIN Datos.Usuarios as u1 on u1.Id = le.IdLider
+                                    INNER JOIN Datos.Usuarios as u2 on u2.Id = le.IdEmpleado
+                                    Where (u1.Id = @idLider or @idLider is null)";
+            var response = await _sqlServerDbContext.Database.GetDbConnection().QueryAsync<EmpleadosLideresDTO?>(sql, new { idLider = datos.IdLider});
+            return response.ToList();
+        }
+
+        public async Task<ApiResponseDTO> EliminarEmpleadosLider(AsignarLideresDTO? datos)
+        {
+            try
+            {
+                var sql = "DELETE FROM [Datos].LiderEmpleados WHERE Id = @id";
+                var response = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { id = datos.Id });
+                return new ApiResponseDTO() { Success = response > 0, Message = $"Empleado eliminado de lider con exito!", Data = response };
+            }
+            catch (Exception e)
+            {
+
+                return new ApiResponseDTO { Success = false, Message = e.Message };
+
+            }
         }
 
         public async Task<List<TiposIdentificacionDTO>> ListarIdentificacion()

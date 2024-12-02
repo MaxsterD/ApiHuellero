@@ -84,10 +84,11 @@ namespace ApiConsola.Services.Horarios
 
         public async Task<ApiResponseDTO> ActualizarHorario(HorariosDTO? datos)
         {
+            
             try
             {
                 string sql = $"UPDATE [Datos].Horarios SET Descripcion = @descripcion, HoraInicio = @horaInicio, HoraFin = @horaFin where Id = @id";
-                var response = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { id = datos?.Id, descripcion = datos?.Descripcion, horaInicio = datos?.HoraInicio, horaFin = datos?.HoraFin });
+                var response = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { id = datos.Id, descripcion = datos.Descripcion, horaInicio = datos.HoraInicio, horaFin = datos.HoraFin });
                 return new ApiResponseDTO { Success = response > 0, Message = "Horario actualizado exitósamente" };
             }
             catch (Exception e)
