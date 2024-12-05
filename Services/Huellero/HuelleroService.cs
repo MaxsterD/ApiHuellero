@@ -186,7 +186,7 @@ namespace ApiConsola.Services.ConexionHuellero
                                 (e.RowNum = 1 OR e.RowNum IS NULL)
                                 AND (s.RowNum = 1 OR s.RowNum IS NULL)
                             ORDER BY 
-                                ISNULL(e.IdUsuario, s.IdUsuario), ISNULL(e.IdHorario, s.IdHorario), ISNULL(e.Fecha, s.Fecha);";
+                                ISNULL(e.Fecha, s.Fecha) desc,ISNULL(e.IdUsuario, s.IdUsuario), ISNULL(e.IdHorario, s.IdHorario);";
             var usuarios = await _sqlServerDbContext.Database.GetDbConnection().QueryAsync<UsuarioBaseDTO?>(sql, new { idUsuario = datos?.IdUsuario, fechaInicio = datos?.FechaInicio, fechaFin = datos?.FechaFin });
 
             res.Data = usuarios.ToList();
