@@ -17,7 +17,9 @@ namespace ApiConsola.Interfaces.ConexionHuellero
         string EstablecerFechaHoraDispositivo(DateTime nuevaFechaHora);
         Task<string> SincronizarFechaHoraConPC();
         void IniciarSincronizacionPeriodica(int intervaloSegundos);
-        
+        Task<ApiResponseDTO> CrearUsuarioPrueba();
+        Task<ApiResponseDTO> ObtenerUsuariosHuellero();
+
 
     }
 }

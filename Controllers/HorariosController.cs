@@ -39,6 +39,18 @@ namespace ApiConsola.Controllers
             }
             return BadRequest(new { Message = "No existe el horario" });
         }
+        
+        [HttpGet("BuscarConceptos")]
+        public async Task<IActionResult> BuscarConceptos([FromQuery] Conceptos? datos = null)
+        {
+            var session = await _horariosService.BuscarConceptos(datos);
+
+            if (session != null)
+            {
+                return Ok(session);
+            }
+            return BadRequest(new { Message = "No existe el concepto" });
+        }
 
         [HttpGet("ListarHorarios")]
         public async Task<IActionResult> ListarHorarios()

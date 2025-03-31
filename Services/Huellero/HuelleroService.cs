@@ -98,95 +98,103 @@ namespace ApiConsola.Services.ConexionHuellero
 
 
             string sql = @$"WITH CTE_Entradas AS (
-                                SELECT 
-                                    E.id as IdEntrada,
-                                    E.IdUsuario as IdUsuario,
-                                    h.Id AS IdHorario,
-                                    E.Fecha,
-                                    E.Hora AS HoraEntrada,
-                                    h.HoraInicio,
-                                    CASE 
-                                        WHEN CAST(E.Hora AS DATETIME) BETWEEN DATEADD(MINUTE, -convert(bigint,p.Value), CAST(h.HoraInicio AS DATETIME)) 
-                                                                          AND DATEADD(MINUTE, convert(bigint,p.Value), CAST(h.HoraInicio AS DATETIME)) 
-                                        THEN 'Temprano'
-                                        ELSE 'Tarde'
-                                    END AS EstadoEntrada,
-                                    ROW_NUMBER() OVER (
-                                        PARTITION BY E.IdUsuario, E.Fecha, h.HoraInicio
-                                        ORDER BY ABS(DATEDIFF(SECOND, CAST(h.HoraInicio AS DATETIME), CAST(E.Hora AS DATETIME))) DESC
-                                    ) AS RowNum
-                                FROM  
-                                    DATOS.Entradas AS E
-                                JOIN 
-                                    Datos.HorariosUsuarios HU ON HU.IdUsuario = E.IdUsuario
-                                JOIN 
-                                    Datos.Horarios H ON H.Id = HU.idHorario
-                                JOIN 
-                                    Configuracion.Parametros P ON P.Id = 1
-                                WHERE
-                                    E.Hora BETWEEN DATEADD(MINUTE, -CONVERT(bigint, P.Value), H.HoraInicio) 
-                                             AND DATEADD(MINUTE, CONVERT(bigint, P.Value), H.HoraInicio)
-                                    AND (E.IdUsuario = @idUsuario or @idUsuario is null)
-                                    AND ((E.Fecha BETWEEN @FechaInicio and @FechaFin) or (@FechaInicio is null and @FechaFin is null))
-                            ),
-                            CTE_Salidas AS (
-                                SELECT 
-                                    S.id as IdSalida,
-                                    S.IdUsuario,
-                                    h.Id AS IdHorario,
-                                    S.Fecha,
-                                    S.Hora AS HoraSalida,
-                                    h.HoraFin,
-                                    CASE 
-                                        WHEN CAST(S.Hora AS DATETIME) BETWEEN DATEADD(MINUTE, -CONVERT(bigint, P.Value), CAST(h.HoraFin AS DATETIME)) 
-                                                                          AND DATEADD(MINUTE, CONVERT(bigint, P.Value), CAST(h.HoraFin AS DATETIME)) 
-                                        THEN 'Temprano'
-                                        ELSE 'Tarde'
-                                    END AS EstadoSalida,
-                                    ROW_NUMBER() OVER (
-                                        PARTITION BY S.IdUsuario, S.Fecha, h.HoraFin
-                                        ORDER BY ABS(DATEDIFF(SECOND, CAST(h.HoraFin AS DATETIME), CAST(S.Hora AS DATETIME))) DESC
-                                    ) AS RowNum
-                                FROM  
-                                    DATOS.Salidas S
-                                JOIN 
-                                    datos.HorariosUsuarios HU on HU.IdUsuario = s.IdUsuario
-                                JOIN 
-                                    Datos.Horarios H on H.Id = HU.idHorario
-                                JOIN 
-                                    Configuracion.Parametros P ON P.Id = 1 
-                                WHERE
-                                    S.Hora BETWEEN DATEADD(MINUTE, -CONVERT(bigint, P.Value), H.HoraFin) 
-                                             AND DATEADD(MINUTE, CONVERT(bigint, P.Value), H.HoraFin)
-                                    AND (S.IdUsuario = @idUsuario or @idUsuario is null)
-                                    AND ((S.Fecha BETWEEN @FechaInicio and @FechaFin) or (@FechaInicio is null and @FechaFin is null))
-                            )
                             SELECT 
-                                ISNULL(e.IdUsuario, s.IdUsuario) AS IdUsuario,
-                                ISNULL(e.IdHorario, s.IdHorario) AS IdHorario,
-                                ISNULL(e.Fecha, s.Fecha) AS Fecha,
-                                CONVERT(VARCHAR(8), CONVERT(TIME, e.HoraEntrada), 108) AS HoraEntrada,
-                                e.EstadoEntrada,
-                                e.IdEntrada,
-                                CONVERT(VARCHAR(8), CONVERT(TIME, s.HoraSalida), 108) AS HoraSalida,
-                                s.EstadoSalida,
-                                s.IdSalida,
-                                e.HoraInicio,
-                                s.HoraFin,
-                                (u.Tipo_Identificacion + CONVERT(VARCHAR(MAX), u.Identificacion) + ' - ' + u.Nombre) AS Empleado
-                            FROM 
-                                CTE_Entradas e
-                            FULL OUTER JOIN 
-                                CTE_Salidas s ON e.IdUsuario = s.IdUsuario 
-                                             AND e.IdHorario = s.IdHorario 
-                                             AND e.Fecha = s.Fecha
+                                E.id as IdEntrada,
+                                E.IdUsuario as IdUsuario,
+                                h.Id AS IdHorario,
+                                E.Fecha,
+                                E.Hora AS HoraEntrada,
+                                h.HoraInicio,
+                                CASE 
+                                    WHEN CAST(E.Hora AS DATETIME) BETWEEN DATEADD(MINUTE, -CONVERT(BIGINT, P.Value), CAST(h.HoraInicio AS DATETIME)) 
+                                                                      AND DATEADD(MINUTE, CONVERT(BIGINT, P.Value), CAST(h.HoraInicio AS DATETIME)) 
+                                    THEN 'Temprano'
+                                    ELSE 'Tarde'
+                                END AS EstadoEntrada,
+                                ROW_NUMBER() OVER (
+                                    PARTITION BY E.IdUsuario, E.Fecha, h.HoraInicio
+                                    ORDER BY ABS(DATEDIFF(SECOND, CAST(h.HoraInicio AS DATETIME), CAST(E.Hora AS DATETIME))) DESC
+                                ) AS RowNum
+                            FROM  
+                                DATOS.Entradas AS E
                             JOIN 
-                                Datos.Usuarios u ON u.Id = ISNULL(e.IdUsuario, s.IdUsuario)
-                            WHERE 
-                                (e.RowNum = 1 OR e.RowNum IS NULL)
-                                AND (s.RowNum = 1 OR s.RowNum IS NULL)
-                            ORDER BY 
-                                ISNULL(e.Fecha, s.Fecha) desc,ISNULL(e.IdUsuario, s.IdUsuario), ISNULL(e.IdHorario, s.IdHorario);";
+                                Datos.HorariosUsuarios HU ON HU.IdUsuario = E.IdUsuario
+                            JOIN 
+                                Datos.Horarios H ON H.Id = HU.idHorario
+                            JOIN 
+                                Datos.HorariosDias HD ON HD.IdHorario = H.Id  -- Validación por día
+                            JOIN 
+                                Configuracion.Parametros P ON P.Id = 1
+                            WHERE
+                                DATEPART(WEEKDAY, E.Fecha) = HD.DiaSemana  -- Filtra por el día de la semana
+                                AND E.Hora BETWEEN DATEADD(MINUTE, -CONVERT(BIGINT, P.Value), H.HoraInicio) 
+                                              AND DATEADD(MINUTE, CONVERT(BIGINT, P.Value), H.HoraInicio)
+                                AND (E.IdUsuario = @idUsuario OR @idUsuario IS NULL)
+                                AND ((E.Fecha BETWEEN @FechaInicio AND @FechaFin) OR (@FechaInicio IS NULL AND @FechaFin IS NULL))
+                        ),
+                        CTE_Salidas AS (
+                            SELECT 
+                                S.id as IdSalida,
+                                S.IdUsuario,
+                                h.Id AS IdHorario,
+                                S.Fecha,
+                                S.Hora AS HoraSalida,
+                                h.HoraFin,
+                                CASE 
+                                    WHEN CAST(S.Hora AS DATETIME) BETWEEN DATEADD(MINUTE, -CONVERT(BIGINT, P.Value), CAST(h.HoraFin AS DATETIME)) 
+                                                                      AND DATEADD(MINUTE, CONVERT(BIGINT, P.Value), CAST(h.HoraFin AS DATETIME)) 
+                                    THEN 'Temprano'
+                                    ELSE 'Tarde'
+                                END AS EstadoSalida,
+                                ROW_NUMBER() OVER (
+                                    PARTITION BY S.IdUsuario, S.Fecha, h.HoraFin
+                                    ORDER BY ABS(DATEDIFF(SECOND, CAST(h.HoraFin AS DATETIME), CAST(S.Hora AS DATETIME))) DESC
+                                ) AS RowNum
+                            FROM  
+                                DATOS.Salidas S
+                            JOIN 
+                                Datos.HorariosUsuarios HU ON HU.IdUsuario = S.IdUsuario
+                            JOIN 
+                                Datos.Horarios H ON H.Id = HU.idHorario
+                            JOIN 
+                                Datos.HorariosDias HD ON HD.IdHorario = H.Id  -- Validación por día
+                            JOIN 
+                                Configuracion.Parametros P ON P.Id = 1 
+                            WHERE
+                                DATEPART(WEEKDAY, S.Fecha) = HD.DiaSemana  -- Filtra por el día de la semana
+                                AND S.Hora BETWEEN DATEADD(MINUTE, -CONVERT(BIGINT, P.Value), H.HoraFin) 
+                                              AND DATEADD(MINUTE, CONVERT(BIGINT, P.Value), H.HoraFin)
+                                AND (S.IdUsuario = @idUsuario OR @idUsuario IS NULL)
+                                AND ((S.Fecha BETWEEN @FechaInicio AND @FechaFin) OR (@FechaInicio IS NULL AND @FechaFin IS NULL))
+                        )
+                        SELECT 
+                            ISNULL(e.IdUsuario, s.IdUsuario) AS IdUsuario,
+                            ISNULL(e.IdHorario, s.IdHorario) AS IdHorario,
+                            ISNULL(e.Fecha, s.Fecha) AS Fecha,
+                            CONVERT(VARCHAR(8), CONVERT(TIME, e.HoraEntrada), 108) AS HoraEntrada,
+                            e.EstadoEntrada,
+                            e.IdEntrada,
+                            CONVERT(VARCHAR(8), CONVERT(TIME, s.HoraSalida), 108) AS HoraSalida,
+                            s.EstadoSalida,
+                            s.IdSalida,
+                            e.HoraInicio,
+                            s.HoraFin,
+                            (u.Tipo_Identificacion + CONVERT(VARCHAR(MAX), u.Identificacion) + ' - ' + u.Nombre) AS Empleado
+                        FROM 
+                            CTE_Entradas e
+                        FULL OUTER JOIN 
+                            CTE_Salidas s ON e.IdUsuario = s.IdUsuario 
+                                         AND e.IdHorario = s.IdHorario 
+                                         AND e.Fecha = s.Fecha
+                        JOIN 
+                            Datos.Usuarios u ON u.Id = ISNULL(e.IdUsuario, s.IdUsuario)
+                        WHERE 
+                            (e.RowNum = 1 OR e.RowNum IS NULL)
+                            AND (s.RowNum = 1 OR s.RowNum IS NULL)
+                        ORDER BY 
+                            ISNULL(e.Fecha, s.Fecha) DESC, 
+                            ISNULL(e.IdUsuario, s.IdUsuario), 
+                            ISNULL(e.IdHorario, s.IdHorario);";
             var usuarios = await _sqlServerDbContext.Database.GetDbConnection().QueryAsync<UsuarioBaseDTO?>(sql, new { idUsuario = datos?.IdUsuario, fechaInicio = datos?.FechaInicio, fechaFin = datos?.FechaFin });
 
             res.Data = usuarios.ToList();
@@ -692,6 +700,72 @@ namespace ApiConsola.Services.ConexionHuellero
             res.Message = $"Usuario creado con éxito. ID: {1}, Nombre: {identificacion}-{nombre}";
             return res;
 
+        }
+
+        public async Task<ApiResponseDTO> CrearUsuarioPrueba()
+        {
+            ApiResponseDTO res = new ApiResponseDTO();
+
+            _device.EnableDevice(1, false);
+            string sql = @$"SELECT ISNULL(MAX(ID),1) AS idUsuario FROM Datos.Usuarios; ";
+            var maxUsuario = await _sqlServerDbContext.Database.GetDbConnection().QueryFirstOrDefaultAsync<IdUsarioDTO?>(sql);
+
+            bool resultado = _device.SSR_SetUserInfo(machineNumber, "9", @$"1001904668-Prueba", "123", 0, true);
+            Console.WriteLine($"Resultado {resultado}");
+            int errorCode1 = 0;
+            _device.GetLastError(ref errorCode1);
+            Console.WriteLine($"Error al registrar usuario. Código: {errorCode1}");
+
+            bool setUserInfo = _device.SetUserInfo(1, 11, @$"1001904668-Alexander", "123", 0, true);
+            if (!setUserInfo)
+            {
+                int errorCode = 0;
+                _device.GetLastError(ref errorCode);
+                Console.WriteLine($"Error al crear el usuario. Código de error: {errorCode}");
+                _device.EnableDevice(1, true);
+                res.Success = false;
+                res.Message = $"Error al crear el usuario. Código de error: {errorCode}";
+                return res;
+
+            }
+            
+            Console.WriteLine($"Usuario creado con éxito. ID: {1001904668}, Nombre: Alexander");
+
+            _device.EnableDevice(1, true);
+
+            res.Success = true;
+            res.Message = $"Usuario creado con éxito. ID: {1}, Nombre: {1001904668}-Alexander";
+            return res;
+
+        }
+
+        public Task<ApiResponseDTO> ObtenerUsuariosHuellero()
+        {
+            int machineNumber = 1;
+            string enrollNumber, name, password;
+            int privilege;
+            bool enabled;
+
+            //// Asegurar conexión
+            //if (!_device.Connect_Net("192.168.1.31", 4370))
+            //{
+            //    int errorCode = 0;
+            //    _device.GetLastError(ref errorCode);
+            //    Console.WriteLine($"Error al conectar con el dispositivo. Código: {errorCode}");
+            //    return null;
+            //}
+
+            _device.ReadAllUserID(machineNumber); // Cargar los usuarios en memoria
+
+            Console.WriteLine("Lista de usuarios en el dispositivo:");
+            while (_device.SSR_GetAllUserInfo(machineNumber, out enrollNumber, out name, out password, out privilege, out enabled))
+            {
+                Console.WriteLine($"ID: {enrollNumber}, Nombre: {name}, Privilegio: {privilege}, Activo: {enabled}");
+            }
+
+            _device.Disconnect();
+
+            return null;
         }
 
         private string ValidarConexion()

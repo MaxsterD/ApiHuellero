@@ -189,12 +189,12 @@ app.UseAuthorization();
 app.MapControllers();
 
 
-using (var scope = app.Services.CreateScope())
-{
-    var conexionHuelleroService = scope.ServiceProvider.GetRequiredService<IHuelleroService>();
-    await conexionHuelleroService.ConectarDispositivo();
-    conexionHuelleroService.IniciarSincronizacionPeriodica(60);
-}
+//using (var scope = app.Services.CreateScope())
+//{
+//    var conexionHuelleroService = scope.ServiceProvider.GetRequiredService<IHuelleroService>();
+//    await conexionHuelleroService.ConectarDispositivo();
+//    conexionHuelleroService.IniciarSincronizacionPeriodica(60);
+//}
 
 
 app.Run();

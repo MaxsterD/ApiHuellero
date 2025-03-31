@@ -25,8 +25,27 @@ namespace ApiConsola.Services.Horarios
         {
             try
             { 
-                var sql = "INSERT INTO [Datos].Horarios (Descripcion,HoraInicio,HoraFin) VALUES (@descripcion,@horaInicio,@horaFin)";
-                var response = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { descripcion = datos.Descripcion, horaInicio = datos.HoraInicio, horaFin = datos.HoraFin });
+                var sql = @$"INSERT INTO [Datos].Horarios (Descripcion,HoraInicio,HoraFin, CodigoConcepto, IdConcepto) VALUES (@descripcion,@horaInicio,@horaFin,@codigoConcepto,@idConcepto) 
+                                SELECT SCOPE_IDENTITY() AS IdHorario; ";
+                var response = await _sqlServerDbContext.Database.GetDbConnection().QueryFirstOrDefaultAsync<int?>(sql, new { descripcion = datos.Descripcion, horaInicio = datos.HoraInicio, horaFin = datos.HoraFin,codigoConcepto = datos.CodigoConcepto, idConcepto = datos.IdConcepto });
+
+                var idHorario = response;
+                
+                foreach (ListaDias dia in datos.DiasLaborales)
+                {
+                    try
+                    {
+                        string sqlD = $"INSERT INTO [Datos].HorariosDias (IdHorario, DiaSemana) VALUES (@IdHorario, @DiaLaboral);";
+                        var responseD = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sqlD, new { IdHorario = idHorario,DiaLaboral = dia.Dia });
+                    }
+                    catch(Exception e)
+                    {
+                        return new ApiResponseDTO { Success = false, Message = e.Message };
+
+                    }
+                    
+                }
+                
                 if (response > 0)
                 {
                     return new ApiResponseDTO() { Success = response > 0, Message = $"Horario creado con exito!", Data = response };
@@ -48,6 +67,34 @@ namespace ApiConsola.Services.Horarios
         {
             string sql = $"SELECT * FROM [Datos].Horarios where (Descripcion like '%' + convert(varchar(50),@descripcion) + '%' or @descripcion is null )";
             var response = await _sqlServerDbContext.Database.GetDbConnection().QueryAsync<HorariosDTO?>(sql, new { descripcion = datos.Descripcion});
+
+            if (response.Any())
+            {
+                foreach (var horario in response)
+                {
+                    string diasSql = @"
+                    SELECT DiaSemana AS Dia 
+                    FROM [Datos].HorariosDias 
+                    WHERE IdHorario = @IdH;
+                    ";
+
+                    var diasHorario = (await _sqlServerDbContext.Database.GetDbConnection()
+                        .QueryAsync<ListaDias>(diasSql, new { IdH = horario.Id }))
+                        .ToList();
+
+                    horario.DiasLaborales = diasHorario;
+                }
+
+                
+            }
+
+            return response.ToList();
+        }
+
+        public async Task<List<Conceptos?>?> BuscarConceptos(Conceptos? datos)
+        {
+            string sql = $"SELECT id,codigo, nombre as Descripcion FROM [Datos].conceptos where (nombre like '%' + convert(varchar(50),@descripcion) + '%' or @descripcion is null ) and (codigo like '%' + convert(varchar(50),@codigo) + '%' or @codigo is null )";
+            var response = await _sqlServerDbContext.Database.GetDbConnection().QueryAsync<Conceptos?>(sql, new { descripcion = datos.Descripcion, codigo = datos.Codigo });
             return response.ToList();
         }
 
@@ -56,6 +103,27 @@ namespace ApiConsola.Services.Horarios
         {
             string sql = $"SELECT * FROM [Datos].Horarios order by id desc";
             var response = await _sqlServerDbContext.Database.GetDbConnection().QueryAsync<HorariosDTO?>(sql);
+
+            if (response.Any())
+            {
+                foreach (var horario in response)
+                {
+                    string diasSql = @"
+                    SELECT DiaSemana AS Dia 
+                    FROM [Datos].HorariosDias 
+                    WHERE IdHorario = @IdH;
+                    ";
+
+                    var diasHorario = (await _sqlServerDbContext.Database.GetDbConnection()
+                        .QueryAsync<ListaDias>(diasSql, new { IdH = horario.Id }))
+                        .ToList();
+
+                    horario.DiasLaborales = diasHorario;
+                }
+
+
+            }
+
             return response.ToList();
         }
 
