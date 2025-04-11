@@ -133,9 +133,13 @@ namespace ApiConsola.Services.Horarios
             { 
                 string sql = $"DELETE FROM [Datos].Horarios where Id = @id";
                 var response = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { id = idHorario });
+
+                string sqlB = $"DELETE FROM [Datos].HorariosDias where IdHorario = @id";
+                var responseB = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sqlB, new { id = idHorario });
+
                 if (response > 0)
                 {
-                    return new ApiResponseDTO() { Success = response > 0, Message = $"Horario creado con exito!", Data = response };
+                    return new ApiResponseDTO() { Success = response > 0, Message = $"Horario eliminado con exito!", Data = response };
                 }
                 else
                 {
@@ -156,6 +160,23 @@ namespace ApiConsola.Services.Horarios
             try
             {
                 string sql = $"UPDATE [Datos].Horarios SET Descripcion = @descripcion, HoraInicio = @horaInicio, HoraFin = @horaFin where Id = @id";
+                string sqlB = $"DELETE FROM [Datos].HorariosDias WHERE idHorario = @IdHorario;";
+                var responseB = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sqlB, new { IdHorario = datos.Id});
+
+                foreach (ListaDias dia in datos.DiasLaborales)
+                {
+                    try
+                    {
+                        string sqlD = $"INSERT INTO [Datos].HorariosDias (IdHorario, DiaSemana) VALUES (@IdHorario, @DiaLaboral);";
+                        var responseD = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sqlD, new { IdHorario = datos.Id, DiaLaboral = dia.Dia });
+                    }
+                    catch (Exception e)
+                    {
+                        return new ApiResponseDTO { Success = false, Message = e.Message };
+
+                    }
+
+                }
                 var response = await _sqlServerDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { id = datos.Id, descripcion = datos.Descripcion, horaInicio = datos.HoraInicio, horaFin = datos.HoraFin });
                 return new ApiResponseDTO { Success = response > 0, Message = "Horario actualizado exitósamente" };
             }
